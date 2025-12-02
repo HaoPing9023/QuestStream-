@@ -42,7 +42,7 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QMessageBox,
 )
-from PySide6.QtCore import Qt, QPropertyAnimation
+from PySide6.QtCore import Qt, QEvent, QPropertyAnimation
 from PySide6.QtGui import QFont
 
 import config
@@ -323,6 +323,7 @@ class QuizWindow(QMainWindow):
         self._apply_style()
         self._init_feedback_animation()
         self._init_question_animation()
+        self._init_button_hover_effects()
         self.refresh_global_stats()
 
     # ---------- UI ----------
@@ -426,18 +427,6 @@ class QuizWindow(QMainWindow):
 
         left_panel.addWidget(settings_group)
 
-        # 总体统计
-        stats_group = QGroupBox("总体统计")
-        stats_layout = QVBoxLayout(stats_group)
-        self.label_stat_total = QLabel("总答题数：0")
-        self.label_stat_correct = QLabel("总正确数：0")
-        self.label_stat_rate = QLabel("总体正确率：0.00%")
-        for w in (self.label_stat_total, self.label_stat_correct, self.label_stat_rate):
-            stats_layout.addWidget(w)
-        self.btn_refresh_stats = QPushButton("刷新统计")
-        stats_layout.addWidget(self.btn_refresh_stats)
-        left_panel.addWidget(stats_group)
-
         spacer = QFrame()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         left_panel.addWidget(spacer)
@@ -456,8 +445,10 @@ class QuizWindow(QMainWindow):
         progress_layout.addWidget(self.progress_label)
         progress_layout.addStretch()
         self.btn_star_favorite = QPushButton("☆ 收藏")
+        self.btn_star_favorite.setObjectName("favoriteStar")
         self.btn_star_favorite.setCheckable(True)
         self.btn_star_favorite.setFlat(True)
+        self.btn_star_favorite.setToolTip("将当前题目加入收藏，方便稍后回看。")
         progress_layout.addWidget(self.btn_star_favorite)
         center_panel.addWidget(progress_frame)
 
@@ -524,6 +515,18 @@ class QuizWindow(QMainWindow):
         self.feedback_edit.setMaximumHeight(280)
         fb_layout.addWidget(self.feedback_edit)
         right_panel.addWidget(feedback_group)
+
+        stats_group = QGroupBox("总体统计")
+        stats_group.setObjectName("statsGroup")
+        stats_layout = QVBoxLayout(stats_group)
+        self.label_stat_total = QLabel("总答题数：0")
+        self.label_stat_correct = QLabel("总正确数：0")
+        self.label_stat_rate = QLabel("总体正确率：0.00%")
+        for w in (self.label_stat_total, self.label_stat_correct, self.label_stat_rate):
+            stats_layout.addWidget(w)
+        self.btn_refresh_stats = QPushButton("刷新统计")
+        stats_layout.addWidget(self.btn_refresh_stats)
+        right_panel.addWidget(stats_group)
 
         r_spacer = QFrame()
         r_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -655,6 +658,19 @@ class QuizWindow(QMainWindow):
         QPushButton#primaryButton:hover {
             background-color: #2563eb;
         }
+        QPushButton#favoriteStar {
+            font-size: 14px;
+            font-weight: 700;
+            color: #b45309;
+            padding: 6px 14px;
+            border-radius: 18px;
+            border: 1px solid #fbbf24;
+            background-color: #fff7ed;
+        }
+        QPushButton#favoriteStar:hover {
+            background-color: #ffedd5;
+            border-color: #f59e0b;
+        }
 
         QTextEdit, QPlainTextEdit {
             border-radius: 6px;
@@ -692,6 +708,9 @@ class QuizWindow(QMainWindow):
             border: 1px solid #1d4ed8;
             border-radius: 8px;
         }
+        #statsGroup QLabel {
+            font-weight: 600;
+        }
         """)
 
     def _init_feedback_animation(self):
@@ -724,6 +743,59 @@ class QuizWindow(QMainWindow):
         self.question_effect.setOpacity(0.0)
         self.question_anim.start()
 
+    def _init_button_hover_effects(self):
+        self._hover_fx = {}
+        interactive_buttons = [
+            self.btn_import_bank,
+            self.btn_delete_bank,
+            self.btn_overview_bank,
+            self.btn_favorite_current,
+            self.btn_view_favorites,
+            self.btn_start_normal,
+            self.btn_start_wrong,
+            self.btn_refresh_stats,
+            self.btn_submit,
+            self.btn_prev,
+            self.btn_next,
+            self.btn_card_jump,
+            self.btn_star_favorite,
+        ]
+        for btn in interactive_buttons:
+            self._attach_hover_fx(btn)
+
+    def _attach_hover_fx(self, btn: QPushButton):
+        effect = QGraphicsOpacityEffect(btn)
+        effect.setOpacity(0.96)
+        btn.setGraphicsEffect(effect)
+
+        anim = QPropertyAnimation(effect, b"opacity", self)
+        anim.setDuration(140)
+        self._hover_fx[btn] = {"effect": effect, "anim": anim}
+        btn.installEventFilter(self)
+
+    def _play_hover_anim(self, btn: QPushButton, target: float):
+        info = self._hover_fx.get(btn)
+        if not info:
+            return
+        anim: QPropertyAnimation = info["anim"]
+        effect: QGraphicsOpacityEffect = info["effect"]
+        anim.stop()
+        anim.setStartValue(effect.opacity())
+        anim.setEndValue(target)
+        anim.start()
+
+    def eventFilter(self, obj, event):
+        if obj in getattr(self, "_hover_fx", {}):
+            if event.type() == QEvent.Enter:
+                self._play_hover_anim(obj, 1.0)
+            elif event.type() == QEvent.Leave:
+                self._play_hover_anim(obj, 0.96)
+            elif event.type() == QEvent.MouseButtonPress:
+                self._play_hover_anim(obj, 0.82)
+            elif event.type() == QEvent.MouseButtonRelease:
+                self._play_hover_anim(obj, 1.0)
+        return super().eventFilter(obj, event)
+
     # ---------- 工具函数 ----------
 
     def set_question_text(self, text: str):
@@ -753,14 +825,17 @@ class QuizWindow(QMainWindow):
             self.btn_star_favorite.setChecked(True)
             self.btn_star_favorite.setText("★ 已收藏")
             self.btn_star_favorite.setStyleSheet(
-                "color: #f59e0b; font-weight: 700; border: none;"
-                " background: transparent;"
+                "color: #92400e; font-weight: 800;"
+                " background: #fffbeb; border: 1px solid #f59e0b;"
+                " border-radius: 18px; padding: 6px 14px;"
             )
         else:
             self.btn_star_favorite.setChecked(False)
             self.btn_star_favorite.setText("☆ 收藏")
             self.btn_star_favorite.setStyleSheet(
-                "color: #9ca3af; border: none; background: transparent;"
+                "color: #374151; background: #f3f4f6;"
+                " border: 1px solid #d1d5db; border-radius: 18px;"
+                " padding: 6px 14px;"
             )
 
     def show_short_answer(self, show: bool):
@@ -1009,13 +1084,20 @@ class QuizWindow(QMainWindow):
         self.set_status("收藏夹窗口已关闭，可以继续刷题。")
 
     def on_refresh_stats(self):
-        reply = QMessageBox.question(
-            self,
-            "刷新统计",
-            "是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setWindowTitle("刷新统计")
+        msg_box.setText("是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。")
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg_box.setDefaultButton(QMessageBox.No)
+        msg_box.setStyleSheet(
+            "QMessageBox {background-color: #f8fafc;}"
+            "QLabel {color: #111827; font-size: 14px;}"
+            "QPushButton {padding: 6px 12px; border-radius: 6px;"
+            " border: 1px solid #cbd5e1; background: #ffffff;}"
+            "QPushButton:hover {background: #e2e8f0;}"
         )
+        reply = msg_box.exec()
 
         if reply == QMessageBox.Yes:
             stats = reset_stats()
