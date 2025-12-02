@@ -42,7 +42,7 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QMessageBox,
 )
-from PySide6.QtCore import Qt, QPropertyAnimation
+from PySide6.QtCore import QEasingCurve, QEvent, Qt, QPropertyAnimation
 from PySide6.QtGui import QFont
 
 import config
@@ -319,6 +319,11 @@ class QuizWindow(QMainWindow):
         self.question_effect: Optional[QGraphicsOpacityEffect] = None
         self.question_anim: Optional[QPropertyAnimation] = None
 
+        self._hover_anims: Dict[QPushButton, QPropertyAnimation] = {}
+
+        self.stats_effect: Optional[QGraphicsOpacityEffect] = None
+        self.stats_anim: Optional[QPropertyAnimation] = None
+
         self._build_ui()
         self._apply_style()
         self._init_feedback_animation()
@@ -426,18 +431,6 @@ class QuizWindow(QMainWindow):
 
         left_panel.addWidget(settings_group)
 
-        # 总体统计
-        stats_group = QGroupBox("总体统计")
-        stats_layout = QVBoxLayout(stats_group)
-        self.label_stat_total = QLabel("总答题数：0")
-        self.label_stat_correct = QLabel("总正确数：0")
-        self.label_stat_rate = QLabel("总体正确率：0.00%")
-        for w in (self.label_stat_total, self.label_stat_correct, self.label_stat_rate):
-            stats_layout.addWidget(w)
-        self.btn_refresh_stats = QPushButton("刷新统计")
-        stats_layout.addWidget(self.btn_refresh_stats)
-        left_panel.addWidget(stats_group)
-
         spacer = QFrame()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         left_panel.addWidget(spacer)
@@ -456,8 +449,9 @@ class QuizWindow(QMainWindow):
         progress_layout.addWidget(self.progress_label)
         progress_layout.addStretch()
         self.btn_star_favorite = QPushButton("☆ 收藏")
+        self.btn_star_favorite.setObjectName("favoriteStar")
+        self.btn_star_favorite.setToolTip("点击收藏 / 取消收藏当前题目")
         self.btn_star_favorite.setCheckable(True)
-        self.btn_star_favorite.setFlat(True)
         progress_layout.addWidget(self.btn_star_favorite)
         center_panel.addWidget(progress_frame)
 
@@ -525,6 +519,17 @@ class QuizWindow(QMainWindow):
         fb_layout.addWidget(self.feedback_edit)
         right_panel.addWidget(feedback_group)
 
+        stats_group = QGroupBox("总体统计")
+        stats_layout = QVBoxLayout(stats_group)
+        self.label_stat_total = QLabel("总答题数：0")
+        self.label_stat_correct = QLabel("总正确数：0")
+        self.label_stat_rate = QLabel("总体正确率：0.00%")
+        for w in (self.label_stat_total, self.label_stat_correct, self.label_stat_rate):
+            stats_layout.addWidget(w)
+        self.btn_refresh_stats = QPushButton("刷新统计")
+        stats_layout.addWidget(self.btn_refresh_stats)
+        right_panel.addWidget(stats_group)
+
         r_spacer = QFrame()
         r_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         right_panel.addWidget(r_spacer)
@@ -569,6 +574,8 @@ class QuizWindow(QMainWindow):
         self._clear_answer_card()
         self.btn_submit.setEnabled(False)
         self._refresh_favorite_star()
+        self._init_hover_animations()
+        self._init_stats_animation(stats_group)
 
     def _apply_style(self):
         self.setStyleSheet("""
@@ -692,7 +699,70 @@ class QuizWindow(QMainWindow):
             border: 1px solid #1d4ed8;
             border-radius: 8px;
         }
+
+        #favoriteStar {
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 18px;
+            border: 1px solid #fbbf24;
+            background-color: #fff7ed;
+            color: #b45309;
+            min-width: 90px;
+        }
+        #favoriteStar:hover {
+            background-color: #ffedd5;
+            border-color: #f59e0b;
+        }
         """)
+
+    def _init_hover_animations(self):
+        buttons = [
+            self.btn_import_bank,
+            self.btn_delete_bank,
+            self.btn_overview_bank,
+            self.btn_favorite_current,
+            self.btn_view_favorites,
+            self.btn_start_normal,
+            self.btn_start_wrong,
+            self.btn_prev,
+            self.btn_next,
+            self.btn_submit,
+            self.btn_card_jump,
+            self.btn_refresh_stats,
+            self.btn_star_favorite,
+        ]
+        for btn in buttons:
+            self._attach_hover_animation(btn)
+
+    def _attach_hover_animation(self, btn: QPushButton):
+        effect = QGraphicsOpacityEffect(btn)
+        effect.setOpacity(1.0)
+        btn.setGraphicsEffect(effect)
+        anim = QPropertyAnimation(effect, b"opacity", btn)
+        anim.setDuration(160)
+        anim.setStartValue(1.0)
+        anim.setEndValue(0.9)
+        anim.setEasingCurve(QEasingCurve.InOutQuad)
+        self._hover_anims[btn] = anim
+        btn.installEventFilter(self)
+
+    def _start_hover_anim(self, btn: QPushButton, target: float):
+        anim = self._hover_anims.get(btn)
+        effect = btn.graphicsEffect()
+        if not anim or not isinstance(effect, QGraphicsOpacityEffect):
+            return
+        anim.stop()
+        anim.setStartValue(effect.opacity())
+        anim.setEndValue(target)
+        anim.start()
+
+    def eventFilter(self, obj, event):
+        if obj in self._hover_anims:
+            if event.type() == QEvent.Enter:
+                self._start_hover_anim(obj, 0.86)
+            elif event.type() == QEvent.Leave:
+                self._start_hover_anim(obj, 1.0)
+        return super().eventFilter(obj, event)
 
     def _init_feedback_animation(self):
         self.feedback_effect = QGraphicsOpacityEffect(self.feedback_edit)
@@ -724,6 +794,22 @@ class QuizWindow(QMainWindow):
         self.question_effect.setOpacity(0.0)
         self.question_anim.start()
 
+    def _init_stats_animation(self, stats_group: QGroupBox):
+        self.stats_effect = QGraphicsOpacityEffect(stats_group)
+        stats_group.setGraphicsEffect(self.stats_effect)
+        self.stats_anim = QPropertyAnimation(self.stats_effect, b"opacity", stats_group)
+        self.stats_anim.setDuration(220)
+        self.stats_anim.setStartValue(0.0)
+        self.stats_anim.setEndValue(1.0)
+        self.stats_anim.setEasingCurve(QEasingCurve.InOutQuad)
+
+    def animate_stats(self):
+        if not self.stats_anim or not self.stats_effect:
+            return
+        self.stats_anim.stop()
+        self.stats_effect.setOpacity(0.0)
+        self.stats_anim.start()
+
     # ---------- 工具函数 ----------
 
     def set_question_text(self, text: str):
@@ -749,18 +835,25 @@ class QuizWindow(QMainWindow):
         self._set_star_style(self.current_question.id in self.favorite_ids)
 
     def _set_star_style(self, is_fav: bool):
+        base_style = (
+            "font-weight: 700; padding: 6px 16px; border-radius: 18px;"
+            " min-width: 90px;"
+        )
         if is_fav:
             self.btn_star_favorite.setChecked(True)
             self.btn_star_favorite.setText("★ 已收藏")
             self.btn_star_favorite.setStyleSheet(
-                "color: #f59e0b; font-weight: 700; border: none;"
-                " background: transparent;"
+                base_style
+                + "border: 1px solid #fbbf24; background-color: #fffbeb; color: #b45309;"
+                + " box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);"
             )
         else:
             self.btn_star_favorite.setChecked(False)
             self.btn_star_favorite.setText("☆ 收藏")
             self.btn_star_favorite.setStyleSheet(
-                "color: #9ca3af; border: none; background: transparent;"
+                base_style
+                + "border: 1px dashed #cbd5e1; background-color: #f8fafc; color: #475569;"
+                + " box-shadow: 0 3px 8px rgba(148, 163, 184, 0.25);"
             )
 
     def show_short_answer(self, show: bool):
@@ -786,6 +879,7 @@ class QuizWindow(QMainWindow):
         self.label_stat_total.setText(f"总答题数：{total_answered}")
         self.label_stat_correct.setText(f"总正确数：{total_correct}")
         self.label_stat_rate.setText(f"总体正确率：{rate}")
+        self.animate_stats()
 
     def refresh_global_stats(self):
         stats = load_stats()
@@ -1009,13 +1103,35 @@ class QuizWindow(QMainWindow):
         self.set_status("收藏夹窗口已关闭，可以继续刷题。")
 
     def on_refresh_stats(self):
-        reply = QMessageBox.question(
-            self,
-            "刷新统计",
-            "是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+        dialog = QMessageBox(self)
+        dialog.setIcon(QMessageBox.Question)
+        dialog.setWindowTitle("刷新统计")
+        dialog.setText("是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。")
+        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dialog.setDefaultButton(QMessageBox.No)
+        dialog.setStyleSheet(
+            """
+            QMessageBox {
+                background-color: #f9fbff;
+                color: #111827;
+                font-size: 13px;
+            }
+            QMessageBox QLabel {
+                color: #111827;
+            }
+            QMessageBox QPushButton {
+                padding: 6px 14px;
+                border-radius: 6px;
+                border: 1px solid #d0d7e2;
+                background-color: #ffffff;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #e0ecff;
+                border-color: #3b82f6;
+            }
+            """
         )
+        reply = dialog.exec()
 
         if reply == QMessageBox.Yes:
             stats = reset_stats()
@@ -1024,7 +1140,7 @@ class QuizWindow(QMainWindow):
             stats = load_stats()
             status = "已刷新总体统计。"
 
-        # 左边“总体统计”区域
+        # 更新“总体统计”区域
         self._apply_stats_to_labels(stats)
 
         # 右侧反馈区展示更详细的刷新结果
