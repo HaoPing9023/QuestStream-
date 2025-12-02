@@ -197,12 +197,14 @@ class QuestionOverviewDialog(QDialog):
             color: #111827;
             gridline-color: #d1d5db;
             font-size: 13px;
+            selection-background-color: #bfdbfe;
+            selection-color: #0f172a;
         }
         QTableWidget::item:selected {
             background-color: #bfdbfe;
             color: #0f172a;
             font-weight: 600;
-            border: 1px solid #2563eb;
+            border: none;
         }
         QTableWidget::item:selected:hover {
             background-color: #bfdbfe;
@@ -260,6 +262,19 @@ class QuestionOverviewDialog(QDialog):
         self.preview_anim.stop()
         self.preview_effect.setOpacity(0.0)
         self.preview_anim.start()
+
+    def _animate_button_pulse(self, btn: QPushButton):
+        effect = getattr(btn, "_pulse_effect", None)
+        if not effect:
+            effect = QGraphicsOpacityEffect(btn)
+            btn.setGraphicsEffect(effect)
+            btn._pulse_effect = effect
+        anim = QPropertyAnimation(effect, b"opacity", btn)
+        anim.setDuration(200)
+        anim.setStartValue(0.6)
+        anim.setEndValue(1.0)
+        anim.setEasingCurve(QEasingCurve.InOutQuad)
+        anim.start(QPropertyAnimation.DeleteWhenStopped)
 
     def _populate_table(self):
         from functools import partial
@@ -337,6 +352,7 @@ class QuestionOverviewDialog(QDialog):
             self.favorite_ids.add(qid)
         save_favorite_ids(self.favorite_ids)
         self._update_fav_button_text(btn, qid)
+        self._animate_button_pulse(btn)
 
 
 class WrongOverviewDialog(QDialog):
@@ -408,12 +424,14 @@ class WrongOverviewDialog(QDialog):
             color: #111827;
             gridline-color: #d1d5db;
             font-size: 13px;
+            selection-background-color: #bfdbfe;
+            selection-color: #0f172a;
         }
         QTableWidget::item:selected {
             background-color: #bfdbfe;
             color: #0f172a;
             font-weight: 600;
-            border: 1px solid #2563eb;
+            border: none;
         }
         QTableWidget::item:selected:hover {
             background-color: #bfdbfe;
@@ -553,6 +571,7 @@ class WrongOverviewDialog(QDialog):
 
         btn.setEnabled(False)
         btn.setText("已移出")
+        self._animate_button_pulse(btn)
         self._remove_row_by_id(qid)
 
     def _remove_row_by_id(self, qid: int):
@@ -1278,7 +1297,9 @@ class QuizWindow(QMainWindow):
     def _refresh_remove_wrong_button(self):
         if not hasattr(self, "btn_remove_wrong"):
             return
-        if not self.current_question:
+        visible = self.mode == "wrong"
+        self.btn_remove_wrong.setVisible(visible)
+        if not visible or not self.current_question:
             self.btn_remove_wrong.setEnabled(False)
             self.btn_remove_wrong.setText("移出错题本")
             return
@@ -1932,6 +1953,19 @@ class QuizWindow(QMainWindow):
             self.set_status("错题本为空：先在“开始刷题”中刷几题，错题会自动加入。")
             self.set_progress("当前未在刷题。")
             self.set_question_text("当前错题本为空。先去做几道题吧。")
+            self.mode = None
+            self.current_questions = []
+            self.current_index = -1
+            self.current_question = None
+            self.index_status.clear()
+            self.user_answers.clear()
+            self.clear_options()
+            self.show_short_answer(False)
+            self.btn_submit.setText("提交答案")
+            self.btn_submit.setEnabled(False)
+            self._refresh_answer_card()
+            self._refresh_favorite_star()
+            self._refresh_remove_wrong_button()
             self.animate_feedback()
             return
 
