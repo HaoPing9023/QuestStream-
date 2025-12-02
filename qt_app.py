@@ -40,6 +40,7 @@ from PySide6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QHeaderView,
+    QMessageBox,
 )
 from PySide6.QtCore import Qt, QPropertyAnimation
 from PySide6.QtGui import QFont
@@ -50,6 +51,7 @@ from storage import (
     load_wrong_questions,
     save_wrong_questions,
     load_stats,
+    reset_stats,
     delete_question_bank,
 )
 from models import Question
@@ -126,7 +128,21 @@ class QuestionOverviewDialog(QDialog):
 
         layout.addWidget(self.table)
 
+        # 选中题目的预览区，增加交互感
+        self.preview = QTextEdit(self)
+        self.preview.setReadOnly(True)
+        self.preview.setMinimumHeight(140)
+        self.preview.setPlaceholderText("点击表格中的题目行，可以在这里预览题干和答案。")
+        layout.addWidget(self.preview)
+
+        self._init_preview_animation()
+        self.table.itemSelectionChanged.connect(self._on_selection_changed)
+
         self._populate_table()
+
+        if self.questions:
+            self.table.selectRow(0)
+            self._on_selection_changed()
 
         # 提升可读性的局部样式
         self.setStyleSheet("""
@@ -144,6 +160,12 @@ class QuestionOverviewDialog(QDialog):
             color: #111827;
             font-weight: 600;
         }
+        QTextEdit#overviewPreview {
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px;
+        }
         QPushButton {
             padding: 4px 10px;
             border-radius: 4px;
@@ -154,6 +176,22 @@ class QuestionOverviewDialog(QDialog):
             background-color: #eff6ff;
         }
         """)
+
+    def _init_preview_animation(self):
+        self.preview.setObjectName("overviewPreview")
+        self.preview_effect = QGraphicsOpacityEffect(self.preview)
+        self.preview.setGraphicsEffect(self.preview_effect)
+        self.preview_anim = QPropertyAnimation(self.preview_effect, b"opacity")
+        self.preview_anim.setDuration(240)
+        self.preview_anim.setStartValue(0.0)
+        self.preview_anim.setEndValue(1.0)
+
+    def _animate_preview(self):
+        if not self.preview_anim or not self.preview_effect:
+            return
+        self.preview_anim.stop()
+        self.preview_effect.setOpacity(0.0)
+        self.preview_anim.start()
 
     def _populate_table(self):
         from functools import partial
@@ -180,6 +218,31 @@ class QuestionOverviewDialog(QDialog):
             btn.setText("取消收藏")
         else:
             btn.setText("收藏")
+
+    def _on_selection_changed(self):
+        row = self.table.currentRow()
+        if row < 0 or row >= len(self.questions):
+            self.preview.clear()
+            return
+
+        q = self.questions[row]
+        lines = [
+            f"题号：{q.id}",
+            f"题型：{qtype_label(q.q_type)}",
+            "",
+            q.question.strip(),
+        ]
+        if q.options:
+            lines.append("")
+            lines.append("选项：")
+            for label, text in sorted(q.options.items()):
+                lines.append(f"- {label}. {text}")
+        if q.answer:
+            lines.append("")
+            lines.append(f"参考答案：{q.answer.strip()}")
+
+        self.preview.setPlainText("\n".join(lines))
+        self._animate_preview()
 
     def _toggle_favorite(self, qid: int, btn: QPushButton):
         if qid in self.favorite_ids:
@@ -253,10 +316,13 @@ class QuizWindow(QMainWindow):
 
         self.feedback_effect: Optional[QGraphicsOpacityEffect] = None
         self.feedback_anim: Optional[QPropertyAnimation] = None
+        self.question_effect: Optional[QGraphicsOpacityEffect] = None
+        self.question_anim: Optional[QPropertyAnimation] = None
 
         self._build_ui()
         self._apply_style()
         self._init_feedback_animation()
+        self._init_question_animation()
         self.refresh_global_stats()
 
     # ---------- UI ----------
@@ -643,6 +709,21 @@ class QuizWindow(QMainWindow):
         self.feedback_effect.setOpacity(0.0)
         self.feedback_anim.start()
 
+    def _init_question_animation(self):
+        self.question_effect = QGraphicsOpacityEffect(self.question_edit)
+        self.question_edit.setGraphicsEffect(self.question_effect)
+        self.question_anim = QPropertyAnimation(self.question_effect, b"opacity")
+        self.question_anim.setDuration(220)
+        self.question_anim.setStartValue(0.0)
+        self.question_anim.setEndValue(1.0)
+
+    def animate_question(self):
+        if not self.question_anim or not self.question_effect:
+            return
+        self.question_anim.stop()
+        self.question_effect.setOpacity(0.0)
+        self.question_anim.start()
+
     # ---------- 工具函数 ----------
 
     def set_question_text(self, text: str):
@@ -698,14 +779,17 @@ class QuizWindow(QMainWindow):
             if w is not None:
                 w.setParent(None)
 
-    def refresh_global_stats(self):
-        stats = load_stats()
+    def _apply_stats_to_labels(self, stats: Dict[str, int]):
         total_answered = stats.get("total_answered", 0)
         total_correct = stats.get("total_correct", 0)
         rate = format_rate(total_correct, total_answered)
         self.label_stat_total.setText(f"总答题数：{total_answered}")
         self.label_stat_correct.setText(f"总正确数：{total_correct}")
         self.label_stat_rate.setText(f"总体正确率：{rate}")
+
+    def refresh_global_stats(self):
+        stats = load_stats()
+        self._apply_stats_to_labels(stats)
 
     def _update_answer_summary(self):
         correct = sum(1 for s in self.index_status if s == "correct")
@@ -925,11 +1009,25 @@ class QuizWindow(QMainWindow):
         self.set_status("收藏夹窗口已关闭，可以继续刷题。")
 
     def on_refresh_stats(self):
+        reply = QMessageBox.question(
+            self,
+            "刷新统计",
+            "是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+
+        if reply == QMessageBox.Yes:
+            stats = reset_stats()
+            status = "统计已重置为初始状态。"
+        else:
+            stats = load_stats()
+            status = "已刷新总体统计。"
+
         # 左边“总体统计”区域
-        self.refresh_global_stats()
+        self._apply_stats_to_labels(stats)
 
         # 右侧反馈区展示更详细的刷新结果
-        stats = load_stats()
         total_answered = stats.get("total_answered", 0)
         total_correct = stats.get("total_correct", 0)
         rate = format_rate(total_correct, total_answered)
@@ -949,10 +1047,12 @@ class QuizWindow(QMainWindow):
             lines.append("各题型表现：")
             for qtype, tot in per_type_total.items():
                 corr = per_type_correct.get(qtype, 0)
-                lines.append(f"- {qtype_label(qtype)}：{corr}/{tot}，正确率 {format_rate(corr, tot)}")
+                lines.append(
+                    f"- {qtype_label(qtype)}：{corr}/{tot}，正确率 {format_rate(corr, tot)}"
+                )
 
         self.set_feedback_text("\n".join(lines))
-        self.set_status("已刷新总体统计。")
+        self.set_status(status)
         self.animate_feedback()
 
     # ---------- 开始刷题 ----------
@@ -1032,6 +1132,7 @@ class QuizWindow(QMainWindow):
             self.set_question_text("")
             self.clear_options()
             self.show_short_answer(False)
+            self.btn_submit.setText("提交答案")
             self.btn_submit.setEnabled(False)
             self._refresh_favorite_star()
             self._refresh_answer_card()
@@ -1102,6 +1203,7 @@ class QuizWindow(QMainWindow):
             if saved:
                 self.short_answer_edit.setPlainText(saved)
 
+        self.animate_question()
         self._update_answer_summary()
         self._refresh_answer_card()
         self._refresh_favorite_star()
@@ -1124,7 +1226,7 @@ class QuizWindow(QMainWindow):
         if self.waiting_answer:
             self._handle_submit_answer()
         else:
-            self._goto_next_question()
+            self.set_status("本题已判分，请使用“上一题 / 下一题”或左侧答题卡继续。")
 
     def _handle_submit_answer(self):
         q = self.current_question
@@ -1180,7 +1282,7 @@ class QuizWindow(QMainWindow):
 
         self.waiting_answer = False
         self.btn_submit.setEnabled(False)
-        self.btn_submit.setText("提交答案")
+        self.btn_submit.setText("已判分")
 
     def _goto_next_question(self):
         if not self.current_questions:
@@ -1204,7 +1306,7 @@ class QuizWindow(QMainWindow):
             self.animate_feedback()
         else:
             self.waiting_answer = False
-            self.btn_submit.setText("提交答案")
+            self.btn_submit.setText("已判分")
             self.btn_submit.setEnabled(False)
             self._show_existing_feedback()
 
@@ -1229,7 +1331,7 @@ class QuizWindow(QMainWindow):
             self.animate_feedback()
         else:
             self.waiting_answer = False
-            self.btn_submit.setText("提交答案")
+            self.btn_submit.setText("已判分")
             self.btn_submit.setEnabled(False)
             self._show_existing_feedback()
 
@@ -1254,7 +1356,7 @@ class QuizWindow(QMainWindow):
             self.animate_feedback()
         else:
             self.waiting_answer = False
-            self.btn_submit.setText("提交答案")
+            self.btn_submit.setText("已判分")
             self.btn_submit.setEnabled(False)
             self._show_existing_feedback()
 
