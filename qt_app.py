@@ -513,7 +513,7 @@ class QuizWindow(QMainWindow):
         self.question_edit.setReadOnly(True)
         self.question_edit.setAcceptRichText(False)
         self.question_edit.setMinimumHeight(160)
-        self.question_edit.setFont(QFont("Microsoft YaHei", 17))
+        self.question_edit.setFont(QFont("Microsoft YaHei", 19))
         q_layout.addWidget(self.question_edit)
         center_panel.addWidget(question_group, 3)
 
@@ -531,7 +531,7 @@ class QuizWindow(QMainWindow):
         self.short_answer_edit.setObjectName("shortAnswerEdit")
         self.short_answer_edit.setPlaceholderText("填空题 / 简答题：在这里输入你的答案。")
         self.short_answer_edit.setMinimumHeight(80)
-        self.short_answer_edit.setFont(QFont("Microsoft YaHei", 15))
+        self.short_answer_edit.setFont(QFont("Microsoft YaHei", 16))
         options_layout_outer.addWidget(self.short_answer_edit)
 
         button_frame = QFrame()
@@ -1016,7 +1016,11 @@ class QuizWindow(QMainWindow):
         self.label_stat_total.setText(f"总答题数：{total_answered}")
         self.label_stat_correct.setText(f"总正确数：{total_correct}")
         self.label_stat_rate.setText(f"总体正确率：{rate}")
-        per_type_total = stats.get("per_type_total", {}) or {}
+        per_type_total = (
+            stats.get("per_type_total")
+            or stats.get("per_type_answered", {})
+            or {}
+        )
         per_type_correct = stats.get("per_type_correct", {}) or {}
         self._render_stats_details(per_type_total, per_type_correct)
         if self.stats_effect:
@@ -1088,6 +1092,8 @@ class QuizWindow(QMainWindow):
     def _setup_navigation(self, count: int):
         self.index_status = ["unanswered"] * count
         self.user_answers = [""] * count
+        self.current_option_value = ""
+        self.short_answer_edit.clear()
 
         self._clear_answer_card()
         if count <= 0:
@@ -1346,8 +1352,7 @@ class QuizWindow(QMainWindow):
         self.animate_feedback()
 
     def _ask_refresh_stats(self) -> bool:
-        """自定义弹窗 + 提示音，询问是否重置统计。"""
-        QApplication.beep()
+        """自定义弹窗询问是否重置统计，不再播放提示音。"""
 
         dialog = QDialog(self)
         dialog.setWindowTitle("刷新统计")
@@ -1483,6 +1488,8 @@ class QuizWindow(QMainWindow):
         self.per_type_correct.clear()
         self.wrong_in_session.clear()
         self.waiting_answer = True
+        self.current_option_value = ""
+        self.short_answer_edit.clear()
 
         self._setup_navigation(len(self.current_questions))
 
@@ -1548,7 +1555,7 @@ class QuizWindow(QMainWindow):
             self.options_box.setTitle("选择“正确”或“错误”")
             for txt in texts:
                 btn = QRadioButton(txt)
-                btn.setStyleSheet("font-size: 16px; padding: 6px 4px; font-weight: 500;")
+                btn.setStyleSheet("font-size: 17px; padding: 6px 4px; font-weight: 500;")
                 btn.toggled.connect(self._make_option_handler(txt))
                 self.options_layout.addWidget(btn)
                 self.option_buttons.append(btn)
@@ -1776,9 +1783,11 @@ class QuizWindow(QMainWindow):
         if not self.current_questions:
             return
 
-        total = sum(self.per_type_total.values())
+        answered = sum(self.per_type_total.values())
         correct = sum(self.per_type_correct.values())
-        wrong = total - correct
+        wrong = answered - correct
+        total_questions = len(self.current_questions)
+        unanswered = max(total_questions - answered, 0)
 
         if self.mode == "normal":
             if self.wrong_in_session:
@@ -1811,10 +1820,12 @@ class QuizWindow(QMainWindow):
         lines = [
             "📊 本轮刷题结束！",
             "",
-            f"总题数：{total}",
+            f"题目总数：{total_questions}",
+            f"已答题：{answered}",
             f"答对数：{correct}",
             f"答错数：{wrong}",
-            f"本轮正确率：{format_rate(correct, total)}",
+            f"未作答：{unanswered}",
+            f"本轮正确率：{format_rate(correct, answered)}",
         ]
         if wrong_msg:
             lines.append("")
@@ -1842,7 +1853,7 @@ class QuizWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    base_font = QFont("Microsoft YaHei", 11)
+    base_font = QFont("Microsoft YaHei", 12)
     app.setFont(base_font)
 
     win = QuizWindow()
