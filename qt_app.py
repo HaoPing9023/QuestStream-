@@ -127,6 +127,7 @@ class QuestionOverviewDialog(QDialog):
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setAlternatingRowColors(True)
+        self.table.setAutoScroll(False)
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
@@ -798,7 +799,6 @@ class QuizWindow(QMainWindow):
             self.btn_next,
             self.btn_submit,
             self.btn_card_jump,
-            self.btn_refresh_stats,
             self.btn_star_favorite,
         ]
         for btn in buttons:
@@ -1035,6 +1035,19 @@ class QuizWindow(QMainWindow):
         if 0 <= self.current_index < self.card_combo.count():
             self.card_combo.setCurrentIndex(self.current_index)
         self.card_combo.blockSignals(False)
+
+    def _update_status_for_current_question(self):
+        if not self.current_questions or self.current_index < 0:
+            return
+        status = (
+            self.index_status[self.current_index]
+            if self.current_index < len(self.index_status)
+            else "unanswered"
+        )
+        if status == "unanswered":
+            self.set_status("请阅读题目后作答，提交后可查看反馈。")
+        else:
+            self.set_status("本题已判分，查看反馈后可点击“下一题”，或用左侧答题卡快速跳题。")
 
     def _on_card_combo_changed(self, combo_index: int):
         if not self.current_questions:
@@ -1535,6 +1548,7 @@ class QuizWindow(QMainWindow):
             self._show_existing_feedback()
 
         self._refresh_answer_card()
+        self._update_status_for_current_question()
 
     def _goto_prev_question(self):
         if not self.current_questions:
@@ -1562,6 +1576,7 @@ class QuizWindow(QMainWindow):
             self._show_existing_feedback()
 
         self._refresh_answer_card()
+        self._update_status_for_current_question()
 
     def _goto_question_idx(self, idx: int):
         if not self.current_questions:
@@ -1589,6 +1604,7 @@ class QuizWindow(QMainWindow):
             self._show_existing_feedback()
 
         self._refresh_answer_card()
+        self._update_status_for_current_question()
 
     def _show_existing_feedback(self):
         if not self.current_questions:
