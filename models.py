@@ -19,6 +19,7 @@ class Question:
     - answer: 正确答案（原文）
     - source: 来源信息（例如 "questions.docx#Q15"）
     - explanation: 解析（目前没用，先留空）
+    - wrong_count: 做错次数（用于错题本）
     """
     id: int
     q_type: str
@@ -27,6 +28,7 @@ class Question:
     answer: str
     source: str = ""
     explanation: str = ""
+    wrong_count: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -52,4 +54,5 @@ class Question:
             answer=data.get("answer", ""),
             source=data.get("source", ""),
             explanation=data.get("explanation", ""),
+            wrong_count=int(data.get("wrong_count", 0) or 0),
         )
