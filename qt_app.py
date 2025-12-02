@@ -93,15 +93,15 @@ def build_app_icon() -> QIcon:
     painter.setRenderHint(QPainter.Antialiasing)
 
     gradient = QLinearGradient(0, 0, 96, 96)
-    gradient.setColorAt(0, QColor("#3b82f6"))
-    gradient.setColorAt(1, QColor("#1d4ed8"))
+    gradient.setColorAt(0, QColor("#2563eb"))
+    gradient.setColorAt(1, QColor("#0f172a"))
     painter.setBrush(QBrush(gradient))
     painter.setPen(Qt.NoPen)
     painter.drawRoundedRect(0, 0, 96, 96, 22, 22)
 
-    painter.setPen(QColor("#f8fafc"))
-    painter.setFont(QFont("Microsoft YaHei", 44, QFont.Bold))
-    painter.drawText(pix.rect(), Qt.AlignCenter, "Q")
+    painter.setPen(QColor("#e2e8f0"))
+    painter.setFont(QFont("Microsoft YaHei", 40, QFont.ExtraBold))
+    painter.drawText(pix.rect(), Qt.AlignCenter, "HP")
     painter.end()
 
     return QIcon(pix)
@@ -140,6 +140,8 @@ class QuestionOverviewDialog(QDialog):
         super().__init__(parent)
         self.questions = questions
         self.favorite_ids = favorite_ids
+        self._current_row = -1
+        self._selection_guard = False
         self.setWindowTitle("题库总览 · 收藏题目")
         if app_icon:
             self.setWindowIcon(app_icon)
@@ -180,12 +182,12 @@ class QuestionOverviewDialog(QDialog):
 
         self._init_preview_animation()
         self.table.clicked.connect(self._on_row_clicked)
+        self.table.selectionModel().selectionChanged.connect(self._on_selection_changed)
 
         self._populate_table()
 
         if self.questions:
-            self.table.selectRow(0)
-            self._on_row_clicked(self.table.model().index(0, 0))
+            self._set_current_row(0, trigger_preview=True)
 
         # 提升可读性的局部样式
         self.setStyleSheet("""
@@ -205,6 +207,11 @@ class QuestionOverviewDialog(QDialog):
             color: #0f172a;
             font-weight: 600;
             border: none;
+            padding-left: 6px;
+            border-left: 3px solid #2563eb;
+        }
+        QTableWidget::item:focus {
+            outline: none;
         }
         QTableWidget::item:selected:hover {
             background-color: #bfdbfe;
@@ -235,6 +242,7 @@ class QuestionOverviewDialog(QDialog):
             border-radius: 6px;
             padding: 8px;
             font-size: 14px;
+            outline: none;
         }
         QPushButton {
             padding: 4px 10px;
@@ -292,6 +300,7 @@ class QuestionOverviewDialog(QDialog):
             self.table.setItem(row, 2, item_q)
 
             btn = QPushButton(self)
+            btn.setFocusPolicy(Qt.NoFocus)
             self._update_fav_button_text(btn, q.id)
             btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
             self.table.setCellWidget(row, 3, btn)
@@ -303,10 +312,21 @@ class QuestionOverviewDialog(QDialog):
             btn.setText("收藏")
 
     def _on_row_clicked(self, model_index):
-        # 保持只有明确点击行时才切换预览，避免鼠标悬停误切换。
         row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
+        self._set_current_row(row, trigger_preview=True)
+
+    def _set_current_row(self, row: int, trigger_preview: bool = False):
+        # 保持只有明确点击行时才切换预览，避免鼠标悬停误切换。
         if row < 0 or row >= len(self.questions):
             self.preview.clear()
+            return
+
+        self._selection_guard = True
+        self._current_row = row
+        self.table.selectRow(row)
+        self._selection_guard = False
+
+        if not trigger_preview:
             return
 
         q = self.questions[row]
@@ -340,10 +360,18 @@ class QuestionOverviewDialog(QDialog):
 
     def _on_fav_button_clicked(self, row: int, qid: int, btn: QPushButton):
         # 点击收藏按钮时，主动保持当前选择行和预览与按钮所在行一致。
-        if 0 <= row < self.table.rowCount():
-            self.table.selectRow(row)
-            self._on_row_clicked(self.table.model().index(row, 0))
+        self._set_current_row(row, trigger_preview=True)
         self._toggle_favorite(qid, btn)
+
+    def _on_selection_changed(self, *_):
+        if self._selection_guard:
+            return
+        if QApplication.mouseButtons() != Qt.NoButton:
+            return
+        if self.table.hasFocus():
+            return
+        if self._current_row >= 0:
+            self._set_current_row(self._current_row)
 
     def _toggle_favorite(self, qid: int, btn: QPushButton):
         if qid in self.favorite_ids:
@@ -368,6 +396,8 @@ class WrongOverviewDialog(QDialog):
         super().__init__(parent)
         self.questions = list(questions)
         self.remove_callback = remove_callback
+        self._current_row = -1
+        self._selection_guard = False
         self.setWindowTitle("错题本总览")
         if app_icon:
             self.setWindowIcon(app_icon)
@@ -408,12 +438,12 @@ class WrongOverviewDialog(QDialog):
 
         self._init_preview_animation()
         self.table.clicked.connect(self._on_row_clicked)
+        self.table.selectionModel().selectionChanged.connect(self._on_selection_changed)
 
         self._populate_table()
 
         if self.questions:
-            self.table.selectRow(0)
-            self._on_row_clicked(self.table.model().index(0, 0))
+            self._set_current_row(0, trigger_preview=True)
 
         self.setStyleSheet("""
         QDialog {
@@ -432,6 +462,11 @@ class WrongOverviewDialog(QDialog):
             color: #0f172a;
             font-weight: 600;
             border: none;
+            padding-left: 6px;
+            border-left: 3px solid #2563eb;
+        }
+        QTableWidget::item:focus {
+            outline: none;
         }
         QTableWidget::item:selected:hover {
             background-color: #bfdbfe;
@@ -462,6 +497,7 @@ class WrongOverviewDialog(QDialog):
             border-radius: 6px;
             padding: 8px;
             font-size: 14px;
+            outline: none;
         }
         QPushButton#removeWrongBtn {
             padding: 4px 12px;
@@ -518,13 +554,25 @@ class WrongOverviewDialog(QDialog):
 
             btn = QPushButton("移出错题本", self)
             btn.setObjectName("removeWrongBtn")
+            btn.setFocusPolicy(Qt.NoFocus)
             btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
             self.table.setCellWidget(row, 4, btn)
 
     def _on_row_clicked(self, model_index):
         row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
+        self._set_current_row(row, trigger_preview=True)
+
+    def _set_current_row(self, row: int, trigger_preview: bool = False):
         if row < 0 or row >= len(self.questions):
             self.preview.clear()
+            return
+
+        self._selection_guard = True
+        self._current_row = row
+        self.table.selectRow(row)
+        self._selection_guard = False
+
+        if not trigger_preview:
             return
 
         q = self.questions[row]
@@ -574,6 +622,16 @@ class WrongOverviewDialog(QDialog):
         self._animate_button_pulse(btn)
         self._remove_row_by_id(qid)
 
+    def _on_selection_changed(self, *_):
+        if self._selection_guard:
+            return
+        if QApplication.mouseButtons() != Qt.NoButton:
+            return
+        if self.table.hasFocus():
+            return
+        if self._current_row >= 0:
+            self._set_current_row(self._current_row)
+
     def _remove_row_by_id(self, qid: int):
         target_row = None
         for r in range(self.table.rowCount()):
@@ -595,8 +653,7 @@ class WrongOverviewDialog(QDialog):
             return
 
         next_row = min(target_row, self.table.rowCount() - 1)
-        self.table.selectRow(next_row)
-        self._on_row_clicked(self.table.model().index(next_row, 0))
+        self._set_current_row(next_row, trigger_preview=True)
 
 
 class QuizWindow(QMainWindow):
@@ -725,13 +782,11 @@ class QuizWindow(QMainWindow):
         self.btn_delete_bank = QPushButton("删除当前题库")
         self.btn_overview_bank = QPushButton("题库总览 / 收藏题目")
         self.btn_wrong_overview = QPushButton("错题本总览")
-        self.btn_favorite_current = QPushButton("收藏当前题目")
         self.btn_view_favorites = QPushButton("查看收藏夹")
         bank_layout.addWidget(self.btn_import_bank)
         bank_layout.addWidget(self.btn_delete_bank)
         bank_layout.addWidget(self.btn_overview_bank)
         bank_layout.addWidget(self.btn_wrong_overview)
-        bank_layout.addWidget(self.btn_favorite_current)
         bank_layout.addWidget(self.btn_view_favorites)
         left_panel.addWidget(bank_group)
 
@@ -921,7 +976,6 @@ class QuizWindow(QMainWindow):
         self.btn_delete_bank.clicked.connect(self.on_delete_bank)
         self.btn_overview_bank.clicked.connect(self.on_overview_bank)
         self.btn_wrong_overview.clicked.connect(self.on_show_wrong_overview)
-        self.btn_favorite_current.clicked.connect(self.on_favorite_current_question)
         self.btn_view_favorites.clicked.connect(self.on_view_favorites)
         self.btn_remove_wrong.clicked.connect(self.on_remove_from_wrong_book)
 
@@ -1071,6 +1125,11 @@ class QuizWindow(QMainWindow):
             background-color: #ffffff;
             font-size: 15px;
         }
+        QTextEdit:focus, QPlainTextEdit:focus {
+            outline: none;
+            border: 1px solid #93c5fd;
+            box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.35);
+        }
         #questionEdit {
             font-size: 17px;
             line-height: 1.7;
@@ -1164,7 +1223,6 @@ class QuizWindow(QMainWindow):
             self.btn_delete_bank,
             self.btn_overview_bank,
             self.btn_wrong_overview,
-            self.btn_favorite_current,
             self.btn_view_favorites,
             self.btn_remove_wrong,
             self.btn_start_normal,
@@ -1314,24 +1372,24 @@ class QuizWindow(QMainWindow):
 
     def _set_star_style(self, is_fav: bool):
         base_style = (
-            "font-weight: 700; padding: 6px 16px; border-radius: 18px;"
-            " min-width: 90px;"
+            "font-weight: 800; font-size: 15px; padding: 8px 18px; border-radius: 18px;"
+            " min-width: 110px; letter-spacing: 0.5px;"
         )
         if is_fav:
             self.btn_star_favorite.setChecked(True)
             self.btn_star_favorite.setText("★ 已收藏")
             self.btn_star_favorite.setStyleSheet(
                 base_style
-                + "border: 1px solid #fbbf24; background-color: #fffbeb; color: #b45309;"
-                + " box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);"
+                + "border: 2px solid #f59e0b; background-color: #fff4e6; color: #9a3412;"
+                + " box-shadow: 0 5px 14px rgba(234, 179, 8, 0.35);"
             )
         else:
             self.btn_star_favorite.setChecked(False)
             self.btn_star_favorite.setText("☆ 收藏")
             self.btn_star_favorite.setStyleSheet(
                 base_style
-                + "border: 1px dashed #cbd5e1; background-color: #f8fafc; color: #475569;"
-                + " box-shadow: 0 3px 8px rgba(148, 163, 184, 0.25);"
+                + "border: 2px dashed #cbd5e1; background-color: #f8fafc; color: #0f172a;"
+                + " box-shadow: 0 4px 10px rgba(148, 163, 184, 0.35);"
             )
 
     def show_short_answer(self, show: bool):
@@ -1634,23 +1692,6 @@ class QuizWindow(QMainWindow):
         self._set_star_style(is_fav)
         return is_fav
 
-    def on_favorite_current_question(self):
-        q = self.current_question
-        if not q:
-            self.set_status("当前没有题目可收藏，请先开始刷题或在题库总览中收藏题目。")
-            self.set_feedback_text("收藏失败：当前没有正在浏览的题目。")
-            self.animate_feedback()
-            return
-
-        qid = q.id
-        is_fav = self._toggle_favorite_state(qid)
-        msg = (
-            f"已收藏题目（题号 {qid}）。" if is_fav else f"已取消收藏题目（题号 {qid}）。"
-        )
-        self.set_status(msg)
-        self.set_feedback_text(msg)
-        self.animate_feedback()
-
     def on_toggle_star_favorite(self):
         q = self.current_question
         if not q:
@@ -1787,33 +1828,35 @@ class QuizWindow(QMainWindow):
         dialog.setStyleSheet(
             """
             QDialog {
-                background-color: #f7fbff;
-                border: 1px solid #d6e4ff;
-                border-radius: 10px;
+                background-color: #f3f6fb;
+                border: 1px solid #cbd5e1;
+                border-radius: 12px;
+                border-top: 4px solid #2c3e50;
             }
             #dialogTitle {
                 font-size: 16px;
                 font-weight: 700;
-                color: #0f172a;
+                color: #1f2937;
             }
             #dialogDesc {
                 font-size: 13px;
                 color: #475569;
             }
             QDialog QPushButton {
-                padding: 6px 14px;
+                padding: 8px 16px;
                 border-radius: 8px;
-                border: 1px solid #d0d7e2;
-                background: #ffffff;
-                min-width: 88px;
-                font-weight: 600;
+                border: 1px solid #2c3e50;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #334155, stop:1 #1f2937);
+                color: #e2e8f0;
+                min-width: 92px;
+                font-weight: 700;
             }
             QDialog QPushButton:hover {
-                background-color: #e0ecff;
-                border-color: #3b82f6;
+                background-color: #1f2937;
+                border-color: #1f2937;
             }
             QDialog QPushButton:pressed {
-                background-color: #cbdafc;
+                background-color: #0f172a;
             }
             """
         )
@@ -1867,38 +1910,39 @@ class QuizWindow(QMainWindow):
         dialog.setStyleSheet(
             """
             QDialog {
-                background-color: #fff7ed;
-                border: 1px solid #fed7aa;
-                border-radius: 10px;
+                background-color: #f7f1ed;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                border-top: 4px solid #2c3e50;
             }
             #dialogTitle {
                 font-size: 16px;
                 font-weight: 700;
-                color: #b91c1c;
+                color: #7f1d1d;
             }
             #dialogDesc {
                 font-size: 13px;
-                color: #7f1d1d;
+                color: #5b2020;
             }
             QDialog QPushButton {
-                padding: 6px 14px;
+                padding: 8px 16px;
                 border-radius: 8px;
-                border: 1px solid #d0d7e2;
+                border: 1px solid #2c3e50;
                 background: #ffffff;
-                min-width: 88px;
-                font-weight: 600;
+                min-width: 92px;
+                font-weight: 700;
             }
             QDialog QPushButton:hover {
-                background-color: #f1f5f9;
-                border-color: #cbd5e1;
+                background-color: #e2e8f0;
+                border-color: #1f2937;
             }
             QPushButton#dangerBtn {
-                background-color: #ef4444;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ef4444, stop:1 #b91c1c);
                 color: #f8fafc;
-                border-color: #dc2626;
+                border-color: #991b1b;
             }
             QPushButton#dangerBtn:hover {
-                background-color: #dc2626;
+                background-color: #b91c1c;
             }
             """
         )
