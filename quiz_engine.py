@@ -257,7 +257,7 @@ def _update_stats(per_type_total: Dict[str, int], per_type_correct: Dict[str, in
     stats["total_correct"] = stats.get("total_correct", 0) + total_correct_round
 
     # 各题型
-    pa = stats.setdefault("per_type_answered", {})
+    pa = stats.setdefault("per_type_total", {})
     pc = stats.setdefault("per_type_correct", {})
 
     for q_type, n in per_type_total.items():

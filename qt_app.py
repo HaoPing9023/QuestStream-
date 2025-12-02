@@ -230,6 +230,8 @@ class QuizWindow(QMainWindow):
 
         self.progress_label: QLabel
 
+        self.btn_star_favorite: QPushButton
+
         self.question_edit: QTextEdit
         self.options_box: QGroupBox
         self.options_layout: QVBoxLayout
@@ -386,6 +388,11 @@ class QuizWindow(QMainWindow):
         progress_layout.setContentsMargins(10, 4, 10, 4)
         self.progress_label = QLabel("当前未在刷题。")
         progress_layout.addWidget(self.progress_label)
+        progress_layout.addStretch()
+        self.btn_star_favorite = QPushButton("☆ 收藏")
+        self.btn_star_favorite.setCheckable(True)
+        self.btn_star_favorite.setFlat(True)
+        progress_layout.addWidget(self.btn_star_favorite)
         center_panel.addWidget(progress_frame)
 
         question_group = QGroupBox("题目")
@@ -483,6 +490,7 @@ class QuizWindow(QMainWindow):
         self.btn_next.clicked.connect(self._goto_next_question)
 
         self.btn_refresh_stats.clicked.connect(self.on_refresh_stats)
+        self.btn_star_favorite.clicked.connect(self.on_toggle_star_favorite)
 
         self.card_combo.currentIndexChanged.connect(self._on_card_combo_changed)
         self.btn_card_jump.clicked.connect(self._on_card_jump_clicked)
@@ -493,6 +501,8 @@ class QuizWindow(QMainWindow):
         self.show_short_answer(False)
         self.clear_options()
         self._clear_answer_card()
+        self.btn_submit.setEnabled(False)
+        self._refresh_favorite_star()
 
     def _apply_style(self):
         self.setStyleSheet("""
@@ -646,6 +656,31 @@ class QuizWindow(QMainWindow):
 
     def set_progress(self, text: str):
         self.progress_label.setText(text or "")
+
+    def _refresh_favorite_star(self):
+        if not hasattr(self, "btn_star_favorite"):
+            return
+        if not self.current_question:
+            self.btn_star_favorite.setEnabled(False)
+            self._set_star_style(False)
+            return
+        self.btn_star_favorite.setEnabled(True)
+        self._set_star_style(self.current_question.id in self.favorite_ids)
+
+    def _set_star_style(self, is_fav: bool):
+        if is_fav:
+            self.btn_star_favorite.setChecked(True)
+            self.btn_star_favorite.setText("★ 已收藏")
+            self.btn_star_favorite.setStyleSheet(
+                "color: #f59e0b; font-weight: 700; border: none;"
+                " background: transparent;"
+            )
+        else:
+            self.btn_star_favorite.setChecked(False)
+            self.btn_star_favorite.setText("☆ 收藏")
+            self.btn_star_favorite.setStyleSheet(
+                "color: #9ca3af; border: none; background: transparent;"
+            )
 
     def show_short_answer(self, show: bool):
         self.short_answer_edit.setVisible(show)
@@ -805,9 +840,12 @@ class QuizWindow(QMainWindow):
         self.set_progress("当前未在刷题。")
         self.set_status("当前题库已删除，统计已重置。")
 
+        self.btn_submit.setEnabled(False)
+
         self._update_answer_summary()
         self.refresh_global_stats()
         self.animate_feedback()
+        self._refresh_favorite_star()
 
     def on_overview_bank(self):
         qs = load_questions_from_file()
@@ -821,6 +859,17 @@ class QuizWindow(QMainWindow):
         dlg.exec()
         self.set_status("题库总览窗口已关闭，可以继续刷题。")
 
+    def _toggle_favorite_state(self, qid: int) -> bool:
+        if qid in self.favorite_ids:
+            self.favorite_ids.remove(qid)
+            is_fav = False
+        else:
+            self.favorite_ids.add(qid)
+            is_fav = True
+        save_favorite_ids(self.favorite_ids)
+        self._set_star_style(is_fav)
+        return is_fav
+
     def on_favorite_current_question(self):
         q = self.current_question
         if not q:
@@ -830,14 +879,27 @@ class QuizWindow(QMainWindow):
             return
 
         qid = q.id
-        if qid in self.favorite_ids:
-            self.favorite_ids.remove(qid)
-            msg = f"已取消收藏题目（题号 {qid}）。"
-        else:
-            self.favorite_ids.add(qid)
-            msg = f"已收藏题目（题号 {qid}）。"
+        is_fav = self._toggle_favorite_state(qid)
+        msg = (
+            f"已收藏题目（题号 {qid}）。" if is_fav else f"已取消收藏题目（题号 {qid}）。"
+        )
+        self.set_status(msg)
+        self.set_feedback_text(msg)
+        self.animate_feedback()
 
-        save_favorite_ids(self.favorite_ids)
+    def on_toggle_star_favorite(self):
+        q = self.current_question
+        if not q:
+            self.set_status("当前没有题目可收藏，请先开始刷题。")
+            self.set_feedback_text("收藏失败：当前没有正在浏览的题目。")
+            self.animate_feedback()
+            self._set_star_style(False)
+            return
+
+        is_fav = self._toggle_favorite_state(q.id)
+        msg = (
+            f"已收藏题目（题号 {q.id}）。" if is_fav else f"已取消收藏题目（题号 {q.id}）。"
+        )
         self.set_status(msg)
         self.set_feedback_text(msg)
         self.animate_feedback()
@@ -872,7 +934,7 @@ class QuizWindow(QMainWindow):
         total_correct = stats.get("total_correct", 0)
         rate = format_rate(total_correct, total_answered)
 
-        per_type_total = stats.get("per_type_total", {})
+        per_type_total = stats.get("per_type_total") or stats.get("per_type_answered", {})
         per_type_correct = stats.get("per_type_correct", {})
 
         lines = [
@@ -956,6 +1018,7 @@ class QuizWindow(QMainWindow):
         self._setup_navigation(len(self.current_questions))
 
         self.btn_submit.setText("提交答案")
+        self.btn_submit.setEnabled(True)
         self.set_status("已开始刷题，选择选项或输入答案后点击“提交答案”。")
         self.set_feedback_text("这里会显示你本题是否答对，以及参考答案。")
         self.animate_feedback()
@@ -969,6 +1032,8 @@ class QuizWindow(QMainWindow):
             self.set_question_text("")
             self.clear_options()
             self.show_short_answer(False)
+            self.btn_submit.setEnabled(False)
+            self._refresh_favorite_star()
             self._refresh_answer_card()
             return
 
@@ -1039,6 +1104,7 @@ class QuizWindow(QMainWindow):
 
         self._update_answer_summary()
         self._refresh_answer_card()
+        self._refresh_favorite_star()
 
     def _make_option_handler(self, value: str):
         def handler(checked: bool):
@@ -1113,7 +1179,8 @@ class QuizWindow(QMainWindow):
         self._refresh_answer_card()
 
         self.waiting_answer = False
-        self.btn_submit.setText("下一题")
+        self.btn_submit.setEnabled(False)
+        self.btn_submit.setText("提交答案")
 
     def _goto_next_question(self):
         if not self.current_questions:
@@ -1132,11 +1199,13 @@ class QuizWindow(QMainWindow):
         if status == "unanswered":
             self.waiting_answer = True
             self.btn_submit.setText("提交答案")
+            self.btn_submit.setEnabled(True)
             self.set_feedback_text("这里会显示你本题是否答对，以及参考答案。")
             self.animate_feedback()
         else:
             self.waiting_answer = False
-            self.btn_submit.setText("下一题")
+            self.btn_submit.setText("提交答案")
+            self.btn_submit.setEnabled(False)
             self._show_existing_feedback()
 
         self._refresh_answer_card()
@@ -1155,11 +1224,13 @@ class QuizWindow(QMainWindow):
         if status == "unanswered":
             self.waiting_answer = True
             self.btn_submit.setText("提交答案")
+            self.btn_submit.setEnabled(True)
             self.set_feedback_text("这里会显示你本题是否答对，以及参考答案。")
             self.animate_feedback()
         else:
             self.waiting_answer = False
-            self.btn_submit.setText("下一题")
+            self.btn_submit.setText("提交答案")
+            self.btn_submit.setEnabled(False)
             self._show_existing_feedback()
 
         self._refresh_answer_card()
@@ -1178,11 +1249,13 @@ class QuizWindow(QMainWindow):
         if status == "unanswered":
             self.waiting_answer = True
             self.btn_submit.setText("提交答案")
+            self.btn_submit.setEnabled(True)
             self.set_feedback_text("这里会显示你本题是否答对，以及参考答案。")
             self.animate_feedback()
         else:
             self.waiting_answer = False
-            self.btn_submit.setText("下一题")
+            self.btn_submit.setText("提交答案")
+            self.btn_submit.setEnabled(False)
             self._show_existing_feedback()
 
         self._refresh_answer_card()
@@ -1272,10 +1345,12 @@ class QuizWindow(QMainWindow):
         self.current_question = None
         self.waiting_answer = False
         self.btn_submit.setText("提交答案")
+        self.btn_submit.setEnabled(False)
 
         self._update_answer_summary()
         self.refresh_global_stats()
         self._refresh_answer_card()
+        self._refresh_favorite_star()
 
 
 def main():
