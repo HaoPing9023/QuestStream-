@@ -16,7 +16,7 @@ from __future__ import annotations
 import os
 import sys
 import random
-from typing import List, Dict, Optional, Set
+from typing import List, Dict, Optional, Set, Callable
 
 import html
 
@@ -46,7 +46,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
 )
 from PySide6.QtCore import QEasingCurve, QEvent, Qt, QParallelAnimationGroup, QPropertyAnimation
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QIcon, QLinearGradient, QPainter, QPixmap, QColor, QBrush
 
 import config
 from storage import (
@@ -83,6 +83,30 @@ def format_rate(correct: int, total: int) -> str:
     return f"{correct * 100.0 / total:.2f}%"
 
 
+def build_app_icon() -> QIcon:
+    """生成一个简洁的应用图标，用于窗口标题和提示弹窗。"""
+
+    pix = QPixmap(96, 96)
+    pix.fill(Qt.transparent)
+
+    painter = QPainter(pix)
+    painter.setRenderHint(QPainter.Antialiasing)
+
+    gradient = QLinearGradient(0, 0, 96, 96)
+    gradient.setColorAt(0, QColor("#3b82f6"))
+    gradient.setColorAt(1, QColor("#1d4ed8"))
+    painter.setBrush(QBrush(gradient))
+    painter.setPen(Qt.NoPen)
+    painter.drawRoundedRect(0, 0, 96, 96, 22, 22)
+
+    painter.setPen(QColor("#f8fafc"))
+    painter.setFont(QFont("Microsoft YaHei", 44, QFont.Bold))
+    painter.drawText(pix.rect(), Qt.AlignCenter, "Q")
+    painter.end()
+
+    return QIcon(pix)
+
+
 def load_favorite_ids() -> Set[int]:
     if not os.path.exists(FAV_JSON_PATH):
         return set()
@@ -106,11 +130,19 @@ def save_favorite_ids(ids: Set[int]):
 class QuestionOverviewDialog(QDialog):
     """题库总览窗口：展示所有题目，并支持收藏 / 取消收藏。"""
 
-    def __init__(self, parent: QMainWindow, questions: List[Question], favorite_ids: Set[int]):
+    def __init__(
+        self,
+        parent: QMainWindow,
+        questions: List[Question],
+        favorite_ids: Set[int],
+        app_icon: Optional[QIcon] = None,
+    ):
         super().__init__(parent)
         self.questions = questions
         self.favorite_ids = favorite_ids
         self.setWindowTitle("题库总览 · 收藏题目")
+        if app_icon:
+            self.setWindowIcon(app_icon)
         self.resize(960, 600)
 
         layout = QVBoxLayout(self)
@@ -172,8 +204,12 @@ class QuestionOverviewDialog(QDialog):
             font-weight: 600;
             border: 1px solid #2563eb;
         }
+        QTableWidget::item:selected:hover {
+            background-color: #bfdbfe;
+            color: #0f172a;
+        }
         QTableWidget::item:hover {
-            background-color: #f5f8ff;
+            background-color: #eef2ff;
         }
         QHeaderView::section {
             background-color: #e5edff;
@@ -303,10 +339,253 @@ class QuestionOverviewDialog(QDialog):
         self._update_fav_button_text(btn, qid)
 
 
+class WrongOverviewDialog(QDialog):
+    """错题本总览：浏览全部错题并可移除。"""
+
+    def __init__(
+        self,
+        parent: QMainWindow,
+        questions: List[Question],
+        remove_callback: Callable[[int], bool],
+        app_icon: Optional[QIcon] = None,
+    ):
+        super().__init__(parent)
+        self.questions = list(questions)
+        self.remove_callback = remove_callback
+        self.setWindowTitle("错题本总览")
+        if app_icon:
+            self.setWindowIcon(app_icon)
+        self.resize(980, 620)
+
+        layout = QVBoxLayout(self)
+
+        self.info_label = QLabel("提示：可查看错题次数，或点击右侧按钮直接移出错题本。")
+        self.info_label.setWordWrap(True)
+        layout.addWidget(self.info_label)
+
+        self.table = QTableWidget(len(self.questions), 5, self)
+        self.table.setHorizontalHeaderLabels(["题号", "题型", "题干预览", "错题次数", "操作"])
+        self.table.verticalHeader().setVisible(False)
+        self.table.verticalHeader().setDefaultSectionSize(32)
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setAlternatingRowColors(True)
+        self.table.setAutoScroll(False)
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+
+        layout.addWidget(self.table)
+
+        preview_group = QGroupBox("完整题目 / 参考答案")
+        preview_layout = QVBoxLayout(preview_group)
+        self.preview = QTextEdit(self)
+        self.preview.setReadOnly(True)
+        self.preview.setMinimumHeight(170)
+        self.preview.setPlaceholderText("点击表格中的题目行，可以在这里预览题干和答案。")
+        self.preview.setFont(QFont("Microsoft YaHei", 12))
+        preview_layout.addWidget(self.preview)
+        layout.addWidget(preview_group)
+
+        self._init_preview_animation()
+        self.table.clicked.connect(self._on_row_clicked)
+
+        self._populate_table()
+
+        if self.questions:
+            self.table.selectRow(0)
+            self._on_row_clicked(self.table.model().index(0, 0))
+
+        self.setStyleSheet("""
+        QDialog {
+            background-color: #f4f6fb;
+        }
+        QTableWidget {
+            background-color: #ffffff;
+            color: #111827;
+            gridline-color: #d1d5db;
+            font-size: 13px;
+        }
+        QTableWidget::item:selected {
+            background-color: #bfdbfe;
+            color: #0f172a;
+            font-weight: 600;
+            border: 1px solid #2563eb;
+        }
+        QTableWidget::item:selected:hover {
+            background-color: #bfdbfe;
+            color: #0f172a;
+        }
+        QTableWidget::item:hover {
+            background-color: #eef2ff;
+        }
+        QHeaderView::section {
+            background-color: #e5edff;
+            color: #111827;
+            font-weight: 600;
+        }
+        QGroupBox {
+            border: 1px solid #d0d7e2;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            left: 10px;
+            padding: 0 4px;
+        }
+        QTextEdit#overviewPreview {
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 14px;
+        }
+        QPushButton#removeWrongBtn {
+            padding: 4px 12px;
+            border-radius: 5px;
+            border: 1px solid #f87171;
+            background-color: #fef2f2;
+            color: #b91c1c;
+            font-weight: 600;
+        }
+        QPushButton#removeWrongBtn:hover {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        QPushButton#removeWrongBtn:disabled {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            color: #94a3b8;
+        }
+        """)
+
+    def _init_preview_animation(self):
+        self.preview.setObjectName("overviewPreview")
+        self.preview_effect = QGraphicsOpacityEffect(self.preview)
+        self.preview.setGraphicsEffect(self.preview_effect)
+        self.preview_anim = QPropertyAnimation(self.preview_effect, b"opacity")
+        self.preview_anim.setDuration(240)
+        self.preview_anim.setStartValue(0.0)
+        self.preview_anim.setEndValue(1.0)
+
+    def _animate_preview(self):
+        if not self.preview_anim or not self.preview_effect:
+            return
+        self.preview_anim.stop()
+        self.preview_effect.setOpacity(0.0)
+        self.preview_anim.start()
+
+    def _populate_table(self):
+        from functools import partial
+
+        for row, q in enumerate(self.questions):
+            item_id = QTableWidgetItem(str(q.id))
+            item_type = QTableWidgetItem(qtype_label(q.q_type))
+            text = q.question.replace("\n", " ")
+            if len(text) > 40:
+                text = text[:40] + "..."
+            item_q = QTableWidgetItem(text)
+            wrong_times = getattr(q, "wrong_count", 0)
+            item_wrong = QTableWidgetItem(str(wrong_times))
+
+            self.table.setItem(row, 0, item_id)
+            self.table.setItem(row, 1, item_type)
+            self.table.setItem(row, 2, item_q)
+            self.table.setItem(row, 3, item_wrong)
+
+            btn = QPushButton("移出错题本", self)
+            btn.setObjectName("removeWrongBtn")
+            btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
+            self.table.setCellWidget(row, 4, btn)
+
+    def _on_row_clicked(self, model_index):
+        row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
+        if row < 0 or row >= len(self.questions):
+            self.preview.clear()
+            return
+
+        q = self.questions[row]
+        title = f"<b>题号：</b>{q.id}    <b>题型：</b>{qtype_label(q.q_type)}"
+        body = html.escape(q.question.strip()).replace("\n", "<br>")
+
+        option_lines = []
+        if q.options:
+            for label, text in sorted(q.options.items()):
+                opt_text = html.escape(text)
+                option_lines.append(f"<li><b>{label}.</b> {opt_text}</li>")
+        options_html = "".join(option_lines)
+
+        answer_html = ""
+        if q.answer:
+            answer_html = (
+                f"<div style='margin-top:8px'><b>参考答案：</b>{html.escape(q.answer.strip())}</div>"
+            )
+
+        wrong_html = ""
+        wrong_times = getattr(q, "wrong_count", 0)
+        if wrong_times:
+            wrong_html = f"<div style='margin-top:6px; color:#b91c1c'>错题次数：{wrong_times}</div>"
+
+        html_text = "".join(
+            [
+                f"<div style='font-size:15px'>{title}</div>",
+                f"<div style='margin-top:6px; font-size:16px; line-height:1.6'>{body}</div>",
+                "<ul style='margin-top:8px; padding-left:16px'>" + options_html + "</ul>" if options_html else "",
+                answer_html,
+                wrong_html,
+            ]
+        )
+
+        self.preview.setHtml(html_text)
+        self._animate_preview()
+
+    def _on_remove_clicked(self, qid: int, btn: QPushButton):
+        if not self.remove_callback:
+            return
+        success = self.remove_callback(qid)
+        if not success:
+            return
+
+        btn.setEnabled(False)
+        btn.setText("已移出")
+        self._remove_row_by_id(qid)
+
+    def _remove_row_by_id(self, qid: int):
+        target_row = None
+        for r in range(self.table.rowCount()):
+            item = self.table.item(r, 0)
+            if item and item.text() == str(qid):
+                target_row = r
+                break
+
+        if target_row is None:
+            return
+
+        if 0 <= target_row < len(self.questions):
+            self.questions.pop(target_row)
+        self.table.removeRow(target_row)
+
+        if self.table.rowCount() == 0:
+            self.preview.setHtml("<b>错题本已清空，快去继续刷题吧！</b>")
+            self.info_label.setText("当前错题本为空，可以关闭窗口返回刷题。")
+            return
+
+        next_row = min(target_row, self.table.rowCount() - 1)
+        self.table.selectRow(next_row)
+        self._on_row_clicked(self.table.model().index(next_row, 0))
+
+
 class QuizWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.app_icon = build_app_icon()
         self.setWindowTitle("本地刷题系统")
+        self.setWindowIcon(self.app_icon)
         self.resize(1180, 720)
         self.setMinimumSize(1000, 650)
 
@@ -426,15 +705,15 @@ class QuizWindow(QMainWindow):
         self.btn_import_bank = QPushButton("导入题库（Word）")
         self.btn_delete_bank = QPushButton("删除当前题库")
         self.btn_overview_bank = QPushButton("题库总览 / 收藏题目")
+        self.btn_wrong_overview = QPushButton("错题本总览")
         self.btn_favorite_current = QPushButton("收藏当前题目")
         self.btn_view_favorites = QPushButton("查看收藏夹")
-        self.btn_remove_wrong = QPushButton("移出错题本")
         bank_layout.addWidget(self.btn_import_bank)
         bank_layout.addWidget(self.btn_delete_bank)
         bank_layout.addWidget(self.btn_overview_bank)
+        bank_layout.addWidget(self.btn_wrong_overview)
         bank_layout.addWidget(self.btn_favorite_current)
         bank_layout.addWidget(self.btn_view_favorites)
-        bank_layout.addWidget(self.btn_remove_wrong)
         left_panel.addWidget(bank_group)
 
         # 答题卡
@@ -505,6 +784,9 @@ class QuizWindow(QMainWindow):
         self.progress_label = QLabel("当前未在刷题。")
         progress_layout.addWidget(self.progress_label)
         progress_layout.addStretch()
+        self.btn_remove_wrong = QPushButton("移出错题本")
+        self.btn_remove_wrong.setObjectName("removeWrongInline")
+        progress_layout.addWidget(self.btn_remove_wrong)
         self.btn_star_favorite = QPushButton("☆ 收藏")
         self.btn_star_favorite.setObjectName("favoriteStar")
         self.btn_star_favorite.setToolTip("点击收藏 / 取消收藏当前题目")
@@ -619,6 +901,7 @@ class QuizWindow(QMainWindow):
         self.btn_import_bank.clicked.connect(self.on_import_bank)
         self.btn_delete_bank.clicked.connect(self.on_delete_bank)
         self.btn_overview_bank.clicked.connect(self.on_overview_bank)
+        self.btn_wrong_overview.clicked.connect(self.on_show_wrong_overview)
         self.btn_favorite_current.clicked.connect(self.on_favorite_current_question)
         self.btn_view_favorites.clicked.connect(self.on_view_favorites)
         self.btn_remove_wrong.clicked.connect(self.on_remove_from_wrong_book)
@@ -843,6 +1126,17 @@ class QuizWindow(QMainWindow):
             background-color: #ffedd5;
             border-color: #f59e0b;
         }
+        QPushButton#removeWrongInline {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #b91c1c;
+            font-weight: 600;
+            padding: 6px 14px;
+        }
+        QPushButton#removeWrongInline:hover {
+            background-color: #fecdd3;
+            border-color: #dc2626;
+        }
         """)
 
     def _init_hover_animations(self):
@@ -850,8 +1144,10 @@ class QuizWindow(QMainWindow):
             self.btn_import_bank,
             self.btn_delete_bank,
             self.btn_overview_bank,
+            self.btn_wrong_overview,
             self.btn_favorite_current,
             self.btn_view_favorites,
+            self.btn_remove_wrong,
             self.btn_start_normal,
             self.btn_start_wrong,
             self.btn_prev,
@@ -1248,6 +1544,10 @@ class QuizWindow(QMainWindow):
             self.animate_feedback()
 
     def on_delete_bank(self):
+        if not self._ask_delete_bank():
+            self.set_status("已取消删除题库。")
+            return
+
         delete_question_bank()
         self.current_bank_docx = None
 
@@ -1284,9 +1584,23 @@ class QuizWindow(QMainWindow):
             self.animate_feedback()
             return
 
-        dlg = QuestionOverviewDialog(self, qs, self.favorite_ids)
+        dlg = QuestionOverviewDialog(self, qs, self.favorite_ids, self.app_icon)
         dlg.exec()
         self.set_status("题库总览窗口已关闭，可以继续刷题。")
+
+    def on_show_wrong_overview(self):
+        wrong_all = load_wrong_questions()
+        if not wrong_all:
+            self.set_status("错题本为空，暂无可预览的错题。")
+            self.set_feedback_text("错题本为空：先刷几道题，错题会自动加入。")
+            self.animate_feedback()
+            return
+
+        dlg = WrongOverviewDialog(self, wrong_all, self._remove_from_wrong_book, self.app_icon)
+        dlg.exec()
+        self._refresh_wrong_book_cache()
+        self._refresh_remove_wrong_button()
+        self.set_status("错题本总览窗口已关闭，可以继续刷题。")
 
     def _toggle_favorite_state(self, qid: int) -> bool:
         if qid in self.favorite_ids:
@@ -1348,7 +1662,7 @@ class QuizWindow(QMainWindow):
             self.animate_feedback()
             return
 
-        dlg = QuestionOverviewDialog(self, fav_questions, self.favorite_ids)
+        dlg = QuestionOverviewDialog(self, fav_questions, self.favorite_ids, self.app_icon)
         dlg.setWindowTitle("收藏夹 · 已收藏的题目")
         dlg.exec()
         self.set_status("收藏夹窗口已关闭，可以继续刷题。")
@@ -1425,6 +1739,7 @@ class QuizWindow(QMainWindow):
 
         dialog = QDialog(self)
         dialog.setWindowTitle("刷新统计")
+        dialog.setWindowIcon(self.app_icon)
         dialog.setModal(True)
 
         layout = QVBoxLayout(dialog)
@@ -1497,6 +1812,88 @@ class QuizWindow(QMainWindow):
 
         dialog.exec()
         return chosen_reset
+
+    def _ask_delete_bank(self) -> bool:
+        """删除题库前的确认弹窗，美观且无提示音。"""
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle("确认删除题库")
+        dialog.setWindowIcon(self.app_icon)
+        dialog.setModal(True)
+
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 16, 20, 16)
+        layout.setSpacing(12)
+
+        title = QLabel("删除当前题库？")
+        title.setObjectName("dialogTitle")
+        desc = QLabel("删除后将同时清空错题本并重置统计，操作不可撤销。")
+        desc.setWordWrap(True)
+        desc.setObjectName("dialogDesc")
+
+        layout.addWidget(title)
+        layout.addWidget(desc)
+
+        btn_row = QHBoxLayout()
+        btn_row.addStretch()
+        btn_cancel = QPushButton("取消")
+        btn_confirm = QPushButton("确认删除")
+        btn_confirm.setObjectName("dangerBtn")
+        btn_row.addWidget(btn_cancel)
+        btn_row.addWidget(btn_confirm)
+        layout.addLayout(btn_row)
+
+        dialog.setStyleSheet(
+            """
+            QDialog {
+                background-color: #fff7ed;
+                border: 1px solid #fed7aa;
+                border-radius: 10px;
+            }
+            #dialogTitle {
+                font-size: 16px;
+                font-weight: 700;
+                color: #b91c1c;
+            }
+            #dialogDesc {
+                font-size: 13px;
+                color: #7f1d1d;
+            }
+            QDialog QPushButton {
+                padding: 6px 14px;
+                border-radius: 8px;
+                border: 1px solid #d0d7e2;
+                background: #ffffff;
+                min-width: 88px;
+                font-weight: 600;
+            }
+            QDialog QPushButton:hover {
+                background-color: #f1f5f9;
+                border-color: #cbd5e1;
+            }
+            QPushButton#dangerBtn {
+                background-color: #ef4444;
+                color: #f8fafc;
+                border-color: #dc2626;
+            }
+            QPushButton#dangerBtn:hover {
+                background-color: #dc2626;
+            }
+            """
+        )
+
+        confirmed = False
+
+        def _confirm_delete():
+            nonlocal confirmed
+            confirmed = True
+            dialog.accept()
+
+        btn_cancel.clicked.connect(dialog.reject)
+        btn_confirm.clicked.connect(_confirm_delete)
+
+        dialog.exec()
+        return confirmed
 
     # ---------- 开始刷题 ----------
 
