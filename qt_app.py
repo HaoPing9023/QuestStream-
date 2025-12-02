@@ -579,6 +579,15 @@ class QuizWindow(QMainWindow):
         self.label_stat_rate = QLabel("总体正确率：0.00%")
         for w in (self.label_stat_total, self.label_stat_correct, self.label_stat_rate):
             stats_layout.addWidget(w)
+
+        self.label_stat_detail = QLabel("各题型表现：")
+        self.label_stat_detail.setObjectName("statDetailTitle")
+        stats_layout.addWidget(self.label_stat_detail)
+
+        self.stats_detail_container = QVBoxLayout()
+        self.stats_detail_container.setSpacing(4)
+        stats_layout.addLayout(self.stats_detail_container)
+
         self.btn_refresh_stats = QPushButton("刷新 / 重置统计")
         self.btn_refresh_stats.setObjectName("refreshStatsBtn")
         stats_layout.addWidget(self.btn_refresh_stats)
@@ -677,6 +686,21 @@ class QuizWindow(QMainWindow):
             font-size: 15px;
             font-weight: 500;
         }
+        #statDetailTitle {
+            font-size: 13px;
+            color: #475569;
+            margin-top: 6px;
+        }
+        #statDetailPlaceholder {
+            font-size: 13px;
+            color: #94a3b8;
+            padding-left: 2px;
+        }
+        #statDetailLine {
+            font-size: 13px;
+            color: #0f172a;
+            padding-left: 2px;
+        }
 
         QComboBox, QSpinBox {
             background-color: #ffffff;
@@ -764,11 +788,38 @@ class QuizWindow(QMainWindow):
         QRadioButton::indicator {
             width: 18px;
             height: 18px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            background: #ffffff;
+            margin-right: 6px;
+            transition: all 0.2s ease;
+        }
+        QRadioButton::indicator:hover {
+            border-color: #3b82f6;
         }
         QRadioButton::indicator:checked {
             background-color: #3b82f6;
             border: 1px solid #1d4ed8;
             border-radius: 8px;
+        }
+
+        QSpinBox {
+            padding-right: 28px;
+        }
+        QSpinBox::up-button, QSpinBox::down-button {
+            width: 22px;
+            border: none;
+            background: transparent;
+            margin: 0;
+            padding: 2px 2px;
+        }
+        QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+            background-color: #e5edff;
+            border-radius: 4px;
+        }
+        QSpinBox::up-arrow, QSpinBox::down-arrow {
+            width: 10px;
+            height: 10px;
         }
 
         #favoriteStar {
@@ -965,12 +1016,48 @@ class QuizWindow(QMainWindow):
         self.label_stat_total.setText(f"总答题数：{total_answered}")
         self.label_stat_correct.setText(f"总正确数：{total_correct}")
         self.label_stat_rate.setText(f"总体正确率：{rate}")
+        per_type_total = stats.get("per_type_total", {}) or {}
+        per_type_correct = stats.get("per_type_correct", {}) or {}
+        self._render_stats_details(per_type_total, per_type_correct)
         if self.stats_effect:
             self.stats_effect.setOpacity(1.0)
 
     def refresh_global_stats(self):
         stats = load_stats()
         self._apply_stats_to_labels(stats)
+
+    def _render_stats_details(self, per_type_total: Dict[str, int], per_type_correct: Dict[str, int]):
+        while self.stats_detail_container.count():
+            item = self.stats_detail_container.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)
+
+        if not per_type_total:
+            placeholder = QLabel("暂无题型统计数据。")
+            placeholder.setObjectName("statDetailPlaceholder")
+            self.stats_detail_container.addWidget(placeholder)
+            return
+
+        for qtype, total in per_type_total.items():
+            correct = per_type_correct.get(qtype, 0)
+            detail = QLabel(
+                f"• {qtype_label(qtype)}：{correct}/{total}，正确率 {format_rate(correct, total)}"
+            )
+            detail.setObjectName("statDetailLine")
+            self.stats_detail_container.addWidget(detail)
+
+    def _save_wrong_question_immediately(self, question: Question):
+        existing = load_wrong_questions()
+        by_id = {q.id: q for q in existing}
+        by_id[question.id] = question
+        save_wrong_questions(list(by_id.values()))
+
+    def _remove_correct_from_wrong_book(self, question_id: int):
+        wrong_all = load_wrong_questions()
+        new_list = [q for q in wrong_all if q.id != question_id]
+        if len(new_list) != len(wrong_all):
+            save_wrong_questions(new_list)
 
     def _update_answer_summary(self):
         correct = sum(1 for s in self.index_status if s == "correct")
@@ -1217,37 +1304,9 @@ class QuizWindow(QMainWindow):
         self.set_status("收藏夹窗口已关闭，可以继续刷题。")
 
     def on_refresh_stats(self):
-        dialog = QMessageBox(self)
-        dialog.setIcon(QMessageBox.Question)
-        dialog.setWindowTitle("刷新统计")
-        dialog.setText("是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。")
-        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        dialog.setDefaultButton(QMessageBox.No)
-        dialog.setStyleSheet(
-            """
-            QMessageBox {
-                background-color: #f9fbff;
-                color: #111827;
-                font-size: 13px;
-            }
-            QMessageBox QLabel {
-                color: #111827;
-            }
-            QMessageBox QPushButton {
-                padding: 6px 14px;
-                border-radius: 6px;
-                border: 1px solid #d0d7e2;
-                background-color: #ffffff;
-            }
-            QMessageBox QPushButton:hover {
-                background-color: #e0ecff;
-                border-color: #3b82f6;
-            }
-            """
-        )
-        reply = dialog.exec()
+        reply_reset = self._ask_refresh_stats()
 
-        if reply == QMessageBox.Yes:
+        if reply_reset:
             stats = reset_stats()
             status = "统计已重置为初始状态。"
         else:
@@ -1285,6 +1344,85 @@ class QuizWindow(QMainWindow):
         self.set_feedback_text("\n".join(lines))
         self.set_status(status)
         self.animate_feedback()
+
+    def _ask_refresh_stats(self) -> bool:
+        """自定义弹窗 + 提示音，询问是否重置统计。"""
+        QApplication.beep()
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle("刷新统计")
+        dialog.setModal(True)
+
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 16, 20, 16)
+        layout.setSpacing(12)
+
+        title = QLabel("刷新统计数据")
+        title.setObjectName("dialogTitle")
+        desc = QLabel("是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。")
+        desc.setWordWrap(True)
+        desc.setObjectName("dialogDesc")
+
+        layout.addWidget(title)
+        layout.addWidget(desc)
+
+        btn_row = QHBoxLayout()
+        btn_row.addStretch()
+        btn_reset = QPushButton("重置")
+        btn_reload = QPushButton("仅刷新")
+        btn_row.addWidget(btn_reload)
+        btn_row.addWidget(btn_reset)
+        layout.addLayout(btn_row)
+
+        dialog.setStyleSheet(
+            """
+            QDialog {
+                background-color: #f7fbff;
+                border: 1px solid #d6e4ff;
+                border-radius: 10px;
+            }
+            #dialogTitle {
+                font-size: 16px;
+                font-weight: 700;
+                color: #0f172a;
+            }
+            #dialogDesc {
+                font-size: 13px;
+                color: #475569;
+            }
+            QDialog QPushButton {
+                padding: 6px 14px;
+                border-radius: 8px;
+                border: 1px solid #d0d7e2;
+                background: #ffffff;
+                min-width: 88px;
+                font-weight: 600;
+            }
+            QDialog QPushButton:hover {
+                background-color: #e0ecff;
+                border-color: #3b82f6;
+            }
+            QDialog QPushButton:pressed {
+                background-color: #cbdafc;
+            }
+            """
+        )
+
+        chosen_reset = False
+
+        def _choose_reset():
+            nonlocal chosen_reset
+            chosen_reset = True
+            dialog.accept()
+
+        def _choose_reload():
+            dialog.accept()
+
+        btn_reset.clicked.connect(_choose_reset)
+        btn_reload.clicked.connect(_choose_reload)
+
+        dialog.exec()
+        return chosen_reset
 
     # ---------- 开始刷题 ----------
 
@@ -1499,6 +1637,7 @@ class QuizWindow(QMainWindow):
             self.per_type_correct[t] = self.per_type_correct.get(t, 0) + 1
         else:
             self.wrong_in_session[q.id] = q
+            self._save_wrong_question_immediately(q)
 
         idx = self.current_index
         if 0 <= idx < len(self.index_status):
@@ -1511,6 +1650,8 @@ class QuizWindow(QMainWindow):
         per_total_once = {t: 1}
         per_correct_once = {t: 1 if is_correct else 0}
         _update_stats(per_total_once, per_correct_once)
+        if is_correct:
+            self._remove_correct_from_wrong_book(q.id)
         self.refresh_global_stats()
 
         self._refresh_answer_card()
