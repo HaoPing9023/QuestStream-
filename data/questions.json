@@ -1,0 +1,2392 @@
+[
+  {
+    "id": 1,
+    "q_type": "single",
+    "question": "下列属于线性数据结构的是( )",
+    "options": {
+      "A": "队列",
+      "B": "树",
+      "C": "图",
+      "D": "不确定"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q1",
+    "explanation": ""
+  },
+  {
+    "id": 2,
+    "q_type": "single",
+    "question": "记录中的各个数据结构项的类型        。",
+    "options": {
+      "A": "必须相同",
+      "B": "不必相同",
+      "C": "不能相同",
+      "D": "不确定"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q2",
+    "explanation": ""
+  },
+  {
+    "id": 3,
+    "q_type": "single",
+    "question": "以下说法正确的是( )",
+    "options": {
+      "A": "数据元素是数据的最小单位",
+      "B": "数据项是数据的基本单位",
+      "C": "数据结构是带有结构的各数据项的集合",
+      "D": "数据结构是带有结构的数据元素的集合"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q3",
+    "explanation": ""
+  },
+  {
+    "id": 4,
+    "q_type": "single",
+    "question": "对一个算法的评价,不包括如下( )方面的内容",
+    "options": {
+      "A": "健壮性和可读性",
+      "B": "并行性",
+      "C": "正确性",
+      "D": "时空复杂度"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q4",
+    "explanation": ""
+  },
+  {
+    "id": 5,
+    "q_type": "single",
+    "question": "图形结构中元素之间存在()关系。",
+    "options": {
+      "A": "一对一",
+      "B": "一对多",
+      "C": "多对多",
+      "D": "多对一"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q5",
+    "explanation": ""
+  },
+  {
+    "id": 6,
+    "q_type": "single",
+    "question": "下列数据结构中,( )是非线性数据结构。",
+    "options": {
+      "A": "树",
+      "B": "字符串",
+      "C": "队",
+      "D": "栈"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q6",
+    "explanation": ""
+  },
+  {
+    "id": 7,
+    "q_type": "single",
+    "question": "一个数组元素a[i]与        的表示等价。",
+    "options": {
+      "A": "*(a+i)",
+      "B": "a+i",
+      "C": "*a+i",
+      "D": "&a+i"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q7",
+    "explanation": ""
+  },
+  {
+    "id": 8,
+    "q_type": "single",
+    "question": "数据的( )包括集合、线性结构、树形结构和图形结构四种基本类型。",
+    "options": {
+      "A": "逻辑结构",
+      "B": "存储结构",
+      "C": "基本运算",
+      "D": "算法描述"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q8",
+    "explanation": ""
+  },
+  {
+    "id": 9,
+    "q_type": "single",
+    "question": "下列( )结构中的州元素的关系是一对多的关系。",
+    "options": {
+      "A": "树",
+      "B": "线性表",
+      "C": "集合",
+      "D": "栈与队列"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q9",
+    "explanation": ""
+  },
+  {
+    "id": 10,
+    "q_type": "single",
+    "question": "从逻辑关系上,可以把数据结构分为( )两大类。",
+    "options": {
+      "A": "动态结构、静态结构",
+      "B": "顺序结构、链式结构",
+      "C": "线性结构、非线性结构",
+      "D": "逻辑结构、物理结构"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q10",
+    "explanation": ""
+  },
+  {
+    "id": 11,
+    "q_type": "single",
+    "question": "以下属于逻辑结构的是( )",
+    "options": {
+      "A": "顺序表",
+      "B": "哈希表",
+      "C": "有序表",
+      "D": "单链表"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q11",
+    "explanation": ""
+  },
+  {
+    "id": 12,
+    "q_type": "single",
+    "question": "下面程序段的时间复杂度为()\ni=1;\nwhile(i<=n)\ni=i*3;",
+    "options": {
+      "A": "O(1)",
+      "B": "O(n)",
+      "C": "O(log 3n)",
+      "D": "O(n/3)"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q12",
+    "explanation": ""
+  },
+  {
+    "id": 13,
+    "q_type": "single",
+    "question": "下列时间复杂度中最坏的是()。",
+    "options": {
+      "A": "O(1)",
+      "B": "O(n)",
+      "C": "O(log2n)",
+      "D": "O(n )"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q13",
+    "explanation": ""
+  },
+  {
+    "id": 14,
+    "q_type": "single",
+    "question": "计算机算法指的是( ),它具有输入、输出、可行性、确定性和有穷性等五个特性。",
+    "options": {
+      "A": "计算方法",
+      "B": "排序方法",
+      "C": "解决问题的优先运算序列",
+      "D": "调度方法"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q14",
+    "explanation": ""
+  },
+  {
+    "id": 15,
+    "q_type": "single",
+    "question": "数据的存储结构是指( )",
+    "options": {
+      "A": "数据所占的存储空间量",
+      "B": "数据的逻辑结构在计算机中的表示",
+      "C": "数据在计算机中的顺序存储方式",
+      "D": "存数在外存中的数据"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q15",
+    "explanation": ""
+  },
+  {
+    "id": 16,
+    "q_type": "single",
+    "question": "在一个长度为n的顺序表中向第i个元素(0<i<n+1)之前插入一个新元素时,需向后移动( )个元素。",
+    "options": {
+      "A": "n-i",
+      "B": "n-i+1",
+      "C": "n-i-1",
+      "D": "i"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q16",
+    "explanation": ""
+  },
+  {
+    "id": 17,
+    "q_type": "single",
+    "question": "在顺序表中,只要知道( ),就可在相同时间内求出任一结点的存储地址。",
+    "options": {
+      "A": "基地址",
+      "B": "结点大小",
+      "C": "向量大小",
+      "D": "基地址和结点大小"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q17",
+    "explanation": ""
+  },
+  {
+    "id": 18,
+    "q_type": "single",
+    "question": "对于顺序表的优缺点,以下说法错误的是( )。",
+    "options": {
+      "A": "无需为表示结点间的逻辑关系而增加额外的存储空间",
+      "B": "可以方便地随机存取表中的任一结点",
+      "C": "插入和删除运算较方便",
+      "D": "容易造成一部分空间长期闲置而得不到充分利用"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q18",
+    "explanation": ""
+  },
+  {
+    "id": 19,
+    "q_type": "single",
+    "question": "线性表的顺序存储结构是一种(B)的存储结构,线性表的链式存储结构是一种( )的存储结构。",
+    "options": {
+      "A": "随机存取",
+      "B": "顺序存取",
+      "C": "索引存取",
+      "D": "散列存取"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q19",
+    "explanation": ""
+  },
+  {
+    "id": 20,
+    "q_type": "single",
+    "question": "在n个结点的顺序表中,算法的时间复杂度是O(1)的操作是( )。",
+    "options": {
+      "A": "访问第i个结点(1≤i≤n)和求第i个结点的直接前驱(2≤i≤n)",
+      "B": "在第i个结点后插入一个新结点(1≤i≤n)",
+      "C": "删除第i个结点(1≤i≤n)",
+      "D": "将n个结点从小到大排序"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q20",
+    "explanation": ""
+  },
+  {
+    "id": 21,
+    "q_type": "single",
+    "question": "以下程序段的时间复杂度是( )。\ni=1;\nwhile(i<=n)\ni=i*3;",
+    "options": {
+      "A": "O(n)",
+      "B": "O(n*n)",
+      "C": "O( )",
+      "D": "O( )"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q21",
+    "explanation": ""
+  },
+  {
+    "id": 22,
+    "q_type": "single",
+    "question": "线性表的顺序存储结构是一种( )的存储结构。",
+    "options": {
+      "A": "随机存取",
+      "B": "顺序存取",
+      "C": "索引存取",
+      "D": "散列存取"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q22",
+    "explanation": ""
+  },
+  {
+    "id": 23,
+    "q_type": "single",
+    "question": "单链表中,增加头结点的目的是为了( )。",
+    "options": {
+      "A": "使单链表至少有一个结点",
+      "B": "标示表结点中首结点的位置",
+      "C": "方便运算的实现",
+      "D": "说明单链表是线性表的链式存储实现"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q23",
+    "explanation": ""
+  },
+  {
+    "id": 24,
+    "q_type": "single",
+    "question": "在一个具有n个结点的有序单链表中插入一个新结点,并保持该表有序,其时间复杂度为( )。",
+    "options": {
+      "A": "O(1)",
+      "B": "O(n)",
+      "C": "O(n 2)",
+      "D": "O(log 2n)"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q24",
+    "explanation": ""
+  },
+  {
+    "id": 25,
+    "q_type": "single",
+    "question": "利用双向链表作线性表的存储结构的优点是        。",
+    "options": {
+      "A": "便于单向进行插入和删除的操作",
+      "B": "便于双向进行插入和删除的操作",
+      "C": "节省空间",
+      "D": "便于销毁结构释放空间"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q25",
+    "explanation": ""
+  },
+  {
+    "id": 26,
+    "q_type": "single",
+    "question": "顺序表中第一个元素的存储地址是100,每个元素的长度为2,则第5个元素的地址是( )。",
+    "options": {
+      "A": "110",
+      "B": "108",
+      "C": "100",
+      "D": "120"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q26",
+    "explanation": ""
+  },
+  {
+    "id": 27,
+    "q_type": "single",
+    "question": "以下关于数据的存储结构的叙述中哪一条是正确的( )。",
+    "options": {
+      "A": "数据的存储结构是数据间关系的抽象描述",
+      "B": "数据的存储结构是逻辑结构在计算机存储器中的实现",
+      "C": "数据的存储结构分为线性结构和非线性结构",
+      "D": "数据的存储结构对数据运算的具体实现没有影响"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q27",
+    "explanation": ""
+  },
+  {
+    "id": 28,
+    "q_type": "single",
+    "question": "函数quicksort的平均计算时间是 ( D ) , 最坏的情形复杂性为( )",
+    "options": {
+      "A": "O(1)",
+      "B": "O(n)",
+      "C": "O (n 2)",
+      "D": "O (nlog 2n)"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q28",
+    "explanation": ""
+  },
+  {
+    "id": 29,
+    "q_type": "single",
+    "question": "在双向循环链表中,在p所指的结点之后插入s指针所指的结点,其操作是()",
+    "options": {
+      "A": "p->next = s; s->prior = p; (p->next)->prior = s; s->next = p->next;",
+      "B": "s->prior = p; s->next = p->next; p->next = s; p->next->prior = s;",
+      "C": "p->next = s; p->next->prior = s; s->prior = p; s->next = p->next;",
+      "D": "s->prior = p; s->next = p->next; p->next->prior = s; p->next = s;"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q29",
+    "explanation": ""
+  },
+  {
+    "id": 30,
+    "q_type": "single",
+    "question": "在向顺序表中第i个元素(1≤i≤n+1)位置插入一个新元素时,为保持插入后表中原有元素的相对次序不变,需要从后向前依次后移( )个元素。",
+    "options": {
+      "A": "n-i",
+      "B": "n-i+1",
+      "C": "n-i-1",
+      "D": "i"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q30",
+    "explanation": ""
+  },
+  {
+    "id": 31,
+    "q_type": "single",
+    "question": "计算机算法指的是解决问题的有限运算序列,它必具备输入、输出和( )等五个特性。",
+    "options": {
+      "A": "可行性、可移植性和可扩充性",
+      "B": "可行性、确定性和有穷性",
+      "C": "确定性、有穷性和稳定性",
+      "D": "易读性、稳定性和安全性"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q31",
+    "explanation": ""
+  },
+  {
+    "id": 32,
+    "q_type": "single",
+    "question": "对于顺序表,以下说法错误的是( )。",
+    "options": {
+      "A": "顺序表是用一维数组实现的线性表,数组的下标可以看成是元素的绝对地址",
+      "B": "顺序表的所有存储结点按相应数据元素间的逻辑关系决定的次序依次排列",
+      "C": "顺序表的特点是:逻辑结构中相邻的结点在存储结构中仍相邻",
+      "D": "顺序表的特点是:逻辑上相邻的元素,存储在物理位置也相邻的单元中"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q32",
+    "explanation": ""
+  },
+  {
+    "id": 33,
+    "q_type": "single",
+    "question": "创建一个包括 n个结点的有序单链表的时间复杂度是( )。",
+    "options": {
+      "A": "O(1)",
+      "B": "O(n)",
+      "C": "O(n 2)",
+      "D": "O(nlog 2n)"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q33",
+    "explanation": ""
+  },
+  {
+    "id": 34,
+    "q_type": "single",
+    "question": "计算机算法指的是:( )",
+    "options": {
+      "A": "计算方法",
+      "B": "排序方法",
+      "C": "解决问题的有限运算序列",
+      "D": "调度方法"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q34",
+    "explanation": ""
+  },
+  {
+    "id": 35,
+    "q_type": "single",
+    "question": "在一个单链表中,已知q结点是p结点的前驱结点,若在q和p之间插入s结点,则执行( )。",
+    "options": {
+      "A": "s->next=p->next; p->next=s",
+      "B": "q->next=s; s->next=p",
+      "C": "p->next=s->next; s->next=p",
+      "D": "p->next=s; s->next=q"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q35",
+    "explanation": ""
+  },
+  {
+    "id": 36,
+    "q_type": "single",
+    "question": "对于一个具有n个结点的单链表,在已知p所指结点后插入一个新结点的时间复杂度是(C);在给定值为x的结点后插入一个新结点的时间复杂度是( )。",
+    "options": {
+      "A": "O(1)",
+      "B": "O(n)",
+      "C": "O (n 2)",
+      "D": "O (nlog 2n)"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q36",
+    "explanation": ""
+  },
+  {
+    "id": 37,
+    "q_type": "single",
+    "question": "在双向循环链表中p所指的结点之后插入s指针所指向的结点,其操作是( )。",
+    "options": {
+      "A": "p->next=s; s->prior=p; p->next->prior=s; s->next=p->next;",
+      "B": "s->prior=p; s->next=p->next; p->next=s; p->next->prior=s;",
+      "C": "p->next=s; p->next->prior=s; s->prior=p; s->next=p->next;",
+      "D": "s->prior=p; s->next=p->next; p->next->prior=s; p->next=s;"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q37",
+    "explanation": ""
+  },
+  {
+    "id": 38,
+    "q_type": "single",
+    "question": "用链表表示线性表的优点是( )。",
+    "options": {
+      "A": "便于插入和删除操作",
+      "B": "数据元素的物理顺序与逻辑顺序相同",
+      "C": "花费的存储空间较顺序存储少",
+      "D": "便于随机存取"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q38",
+    "explanation": ""
+  },
+  {
+    "id": 39,
+    "q_type": "single",
+    "question": "在带头结点的循环链表中,将头指针改设为尾指针(rear)后,其头结点和尾结点的存储位置分别是( )。",
+    "options": {
+      "A": "rear和rear->ext->next",
+      "B": "rear->next和rear",
+      "C": "rear->next->next和rear",
+      "D": "rear和rear->next"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q39",
+    "explanation": ""
+  },
+  {
+    "id": 40,
+    "q_type": "single",
+    "question": "下列关于数据和逻辑结构的叙述中,哪一个是不正确的( )。",
+    "options": {
+      "A": "数据的逻辑结构是数据间关系的描述",
+      "B": "数据的逻辑结构抽象反映数据元素间的逻辑关系",
+      "C": "数据的逻辑结构具体反映数据在计算机中的存储方式",
+      "D": "数据的逻辑结构分为线性结构和非线性结构"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q40",
+    "explanation": ""
+  },
+  {
+    "id": 41,
+    "q_type": "single",
+    "question": "循环队列A[0…m-1]存放其元素值,用front和rear分别表示队头和队尾,则当前队列中的元素数是( )。",
+    "options": {
+      "A": "(rear-front+m)%m",
+      "B": "rear-front+1",
+      "C": "rear-front-1",
+      "D": "rear-front"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q41",
+    "explanation": ""
+  },
+  {
+    "id": 42,
+    "q_type": "single",
+    "question": "有六个元素6,5,4,3,2,1的顺序进栈,问下列哪一个不是合法的出栈序列?( )",
+    "options": {
+      "A": "5 4 3 6 1 2",
+      "B": "4 5 3 1 2 6",
+      "C": "3 4 6 5 2 1",
+      "D": "2 3 4 1 5 6"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q42",
+    "explanation": ""
+  },
+  {
+    "id": 43,
+    "q_type": "single",
+    "question": "栈在( )中应用。",
+    "options": {
+      "A": "递归调用",
+      "B": "子程序调用",
+      "C": "表达式求值",
+      "D": "A,B,C"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q43",
+    "explanation": ""
+  },
+  {
+    "id": 44,
+    "q_type": "single",
+    "question": "循环队列的队满条件为( )。",
+    "options": {
+      "A": "(sq.rear+1)%maxsize==(sq.front+1)%maxsize",
+      "B": "(sq.rear+1)%maxsize==sq.front+1",
+      "C": "sq.(rear+1)%maxsize==sq.front",
+      "D": "sq.rear==sq.front"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q44",
+    "explanation": ""
+  },
+  {
+    "id": 45,
+    "q_type": "single",
+    "question": "链栈与顺序栈相比,有一个比较明显的优点,即( )",
+    "options": {
+      "A": "插入操作方便",
+      "B": "通常不会出现栈满的情况",
+      "C": "不会出现栈空的情况",
+      "D": "删除操作更方便"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q45",
+    "explanation": ""
+  },
+  {
+    "id": 46,
+    "q_type": "single",
+    "question": "队列的操作原则是( )。",
+    "options": {
+      "A": "先进先出",
+      "B": "后进先出",
+      "C": "先进后出",
+      "D": "不分顺序"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q46",
+    "explanation": ""
+  },
+  {
+    "id": 47,
+    "q_type": "single",
+    "question": "有六个元素(6, 5, 4, 3, 2, 1)的顺序进栈,问下列哪一个不是合法的出栈序列?( )",
+    "options": {
+      "A": "5 4 3 6 1 2",
+      "B": "4 5 3 1 2 6",
+      "C": "3 4 6 5 2 1",
+      "D": "2 3 4 1 5 6"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q47",
+    "explanation": ""
+  },
+  {
+    "id": 48,
+    "q_type": "single",
+    "question": "在一个链队列中,front和rear分别为头指针和尾指针,则插入一个结点s的操作为( )",
+    "options": {
+      "A": "front=front->next",
+      "B": "s->next=rear;rear=s",
+      "C": "rear->next=s;rear=s;",
+      "D": "s->next=front;front=s;"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q48",
+    "explanation": ""
+  },
+  {
+    "id": 49,
+    "q_type": "single",
+    "question": "用链接方式存储的队列,在进行插入运算时( ).",
+    "options": {
+      "A": "仅修改头指针",
+      "B": "头、尾指针都要修改",
+      "C": "仅修改尾指针",
+      "D": "头、尾指针可能都要修改"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q49",
+    "explanation": ""
+  },
+  {
+    "id": 50,
+    "q_type": "single",
+    "question": "数组Q[n]来表示一个循环队列,f为当前队列头元素的前一个位置,r为队尾元素的位置,假定队列中元素的个数小于n,计算队列中元素的公式:",
+    "options": {
+      "A": "r-f",
+      "B": "(n+f-r)%n",
+      "C": "n+r-f",
+      "D": "(n+r-f)%n"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q50",
+    "explanation": ""
+  },
+  {
+    "id": 51,
+    "q_type": "single",
+    "question": "一棵完全二叉树中根结点的编号为1,而且编号为23的结点有左孩子但没有右孩子,则此树中共有( )个结点。",
+    "options": {
+      "A": "24",
+      "B": "45",
+      "C": "46",
+      "D": "47"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q51",
+    "explanation": ""
+  },
+  {
+    "id": 52,
+    "q_type": "single",
+    "question": "在完全二叉树中,当i为奇数且不等于1时,结点i的左兄弟是结点( ),否则没有左兄弟。",
+    "options": {
+      "A": "2i-1",
+      "B": "i+1",
+      "C": "2i+1",
+      "D": "i-1"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q52",
+    "explanation": ""
+  },
+  {
+    "id": 53,
+    "q_type": "single",
+    "question": "线索二叉树中,结点p没有左子树的充要条件是( )",
+    "options": {
+      "A": "p->lc=NULL",
+      "B": "p->ltag=1",
+      "C": "p->ltag=1且p->lc=NULL",
+      "D": "以上都不对"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q53",
+    "explanation": ""
+  },
+  {
+    "id": 54,
+    "q_type": "single",
+    "question": "由权值分别为3,8,6,2,5的叶子结点生成一棵霍夫曼树,它的带权路径长度为( )。",
+    "options": {
+      "A": "24",
+      "B": "48",
+      "C": "72",
+      "D": "53"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q54",
+    "explanation": ""
+  },
+  {
+    "id": 55,
+    "q_type": "single",
+    "question": "设森林F中有三棵树,第一、第二、第三棵树的结点个数分别为M1, M2和M3。则与森林F对应的二叉树根结点的右子树上的结点个数是:",
+    "options": {
+      "A": "M1",
+      "B": "M3",
+      "C": "M1+M2",
+      "D": "M2+M3"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q55",
+    "explanation": ""
+  },
+  {
+    "id": 56,
+    "q_type": "single",
+    "question": "已知一棵完全二叉树的结点总数为9个,则最后一层的结点数为( )。",
+    "options": {
+      "A": "1",
+      "B": "2",
+      "C": "3",
+      "D": "4"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q56",
+    "explanation": ""
+  },
+  {
+    "id": 57,
+    "q_type": "single",
+    "question": "若一棵二叉树具有10个度为2的结点,5个度为1的结点,则度为0的结点个数是( )",
+    "options": {
+      "A": "9",
+      "B": "11",
+      "C": "15",
+      "D": "不确定"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q57",
+    "explanation": ""
+  },
+  {
+    "id": 58,
+    "q_type": "single",
+    "question": "设n,m为一棵二叉树上的两个结点,在中序遍历时,n在m前的条件是( )",
+    "options": {
+      "A": "n在m的右边",
+      "B": "n是m的祖先",
+      "C": "n在m的左边",
+      "D": "n是m的子孙"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q58",
+    "explanation": ""
+  },
+  {
+    "id": 59,
+    "q_type": "single",
+    "question": "算术表达式a+b*(c+d/e)转为后缀表达式后为( )",
+    "options": {
+      "A": "ab+cde/*",
+      "B": "abcde/+*+",
+      "C": "abcde/*++",
+      "D": "abcde*/++"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q59",
+    "explanation": ""
+  },
+  {
+    "id": 60,
+    "q_type": "single",
+    "question": "已知二叉排序树如下图所示,元素之间应满足的大小关系是:()",
+    "options": {
+      "A": "x1<x2<x5",
+      "B": "x1<x4<x5",
+      "C": "x3<x5<x4",
+      "D": "x4<x3<x5"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q60",
+    "explanation": ""
+  },
+  {
+    "id": 61,
+    "q_type": "single",
+    "question": "在一个具有n个顶点和e条边的有向图的邻接矩阵中, 表示边存在的元素个数为( )。",
+    "options": {
+      "A": "n",
+      "B": "n×e",
+      "C": "e",
+      "D": "2×e"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q61",
+    "explanation": ""
+  },
+  {
+    "id": 62,
+    "q_type": "single",
+    "question": "设图G有n个顶点和e条边,当G是非孤立顶点的连通图时,有2e≥n,故可推得深度优先搜索的时间复杂度为( )。",
+    "options": {
+      "A": "O(e)",
+      "B": "O(n)",
+      "C": "O(ne)",
+      "D": "O(n+e)"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q62",
+    "explanation": ""
+  },
+  {
+    "id": 63,
+    "q_type": "single",
+    "question": "设有6个结点的无向图,该图至少应有( )条边才能确保是一个连通图。",
+    "options": {
+      "A": "5",
+      "B": "6",
+      "C": "7",
+      "D": "8"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q63",
+    "explanation": ""
+  },
+  {
+    "id": 64,
+    "q_type": "single",
+    "question": "关键路径是事件结点网络中( )。",
+    "options": {
+      "A": "从源点到汇点的最长路径",
+      "B": "从源点到汇点的最短路径",
+      "C": "最长回路",
+      "D": "最短回路"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q64",
+    "explanation": ""
+  },
+  {
+    "id": 65,
+    "q_type": "single",
+    "question": "具有n个顶点的无向完全图,边的总数为( )条。",
+    "options": {
+      "A": "n-1",
+      "B": "n",
+      "C": "n+1",
+      "D": "n*(n-1)/2"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q65",
+    "explanation": ""
+  },
+  {
+    "id": 66,
+    "q_type": "single",
+    "question": "连通分量指的是( )",
+    "options": {
+      "A": "无向图中的极小连通子图",
+      "B": "无向图中的极大连通子图",
+      "C": "有向图中的极小连通子图",
+      "D": "有向图中的极大连通子图"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q66",
+    "explanation": ""
+  },
+  {
+    "id": 67,
+    "q_type": "single",
+    "question": "在图中自d点开始进行深度优先遍历算法可能得到的结果为:",
+    "options": {
+      "A": "d,a,c,f,e,b",
+      "B": "d,a,e,b,c,f",
+      "C": "d,e,a,c,f,b",
+      "D": "d,f,c,",
+      "E": ",a,b"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q67",
+    "explanation": ""
+  },
+  {
+    "id": 68,
+    "q_type": "single",
+    "question": "若一个图中包含有k个连通分量,若要按照深度优先搜索的方法访问所有顶点,则必须调用( )次深度优先搜索遍历的算法。",
+    "options": {
+      "A": "k",
+      "B": "1",
+      "C": "k-1",
+      "D": "k+1"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q68",
+    "explanation": ""
+  },
+  {
+    "id": 69,
+    "q_type": "single",
+    "question": "假设一个有n个顶点和e条弧的有向图用邻接表表示,则删除与某个顶点vi相关的所有弧的时间复杂度是( )",
+    "options": {
+      "A": "O(n)",
+      "B": "O(e)",
+      "C": "O(n+e)",
+      "D": "O(n*e)"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q69",
+    "explanation": ""
+  },
+  {
+    "id": 70,
+    "q_type": "single",
+    "question": "下列说法不正确的是( )。",
+    "options": {
+      "A": "图的遍历是从给定的源点出发每一个顶点仅被访问一次",
+      "B": "遍历的基本算法有两种:深度遍历和广度遍历",
+      "C": "图的深度遍历不适用于有向图",
+      "D": "图的深度遍历是一个递归过程"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q70",
+    "explanation": ""
+  },
+  {
+    "id": 71,
+    "q_type": "single",
+    "question": "设某散列表的长度为100,散列函数H(k)=k % P,则P通常情况下最好选择( )。",
+    "options": {
+      "A": "99",
+      "B": "97",
+      "C": "91",
+      "D": "93"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q71",
+    "explanation": ""
+  },
+  {
+    "id": 72,
+    "q_type": "single",
+    "question": "设有一组记录的关键字为{19, 14, 23, 1, 68, 20, 84, 27, 55, 11, 10, 79},用链地址法构造散列表,散列函数为H(key)=key MOD 13,散列地址为1的链中有( )个记录。",
+    "options": {
+      "A": "1",
+      "B": "2",
+      "C": "3",
+      "D": "4"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q72",
+    "explanation": ""
+  },
+  {
+    "id": 73,
+    "q_type": "single",
+    "question": "设有n个关键字具有相同的Hash函数值,则用线性探测法把这n个关键字映射到HASH表中需要做( )次线性探测。\nA、",
+    "options": {
+      "B": "n(n+1)",
+      "C": "n(n+1)/2",
+      "D": "n(n-1)/2"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q73",
+    "explanation": ""
+  },
+  {
+    "id": 74,
+    "q_type": "single",
+    "question": "给定散列表大小为11,散列函数为H(Key)=Key%11。采用平方探测法处理冲突:h i(k)=(H(k)±i 2)%11将关键字序列{ 6,25,39,61 }依次插入到散列表中。那么元素61存放在散列表中的位置是:",
+    "options": {
+      "A": "8",
+      "B": "7",
+      "C": "6",
+      "D": "5"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q74",
+    "explanation": ""
+  },
+  {
+    "id": 75,
+    "q_type": "single",
+    "question": "在索引查找中，若用于保存数据元素的主表的长度为n，它被均分为k个子表，每个子表的长度均为n/k，则索引查找的平均查找长度为（ ）。",
+    "options": {
+      "A": "n+k",
+      "B": "k+n/k",
+      "C": "(k+n/k)/2",
+      "D": "(k+n/k)/2+1"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q75",
+    "explanation": ""
+  },
+  {
+    "id": 76,
+    "q_type": "single",
+    "question": "用二分(对半)查找表的元素的速度比用顺序法( )。",
+    "options": {
+      "A": "必然快",
+      "B": "必然慢",
+      "C": "相等",
+      "D": "不能确定"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q76",
+    "explanation": ""
+  },
+  {
+    "id": 77,
+    "q_type": "single",
+    "question": "若根据查找表(23,44,36,48,52,73,64,58)建立哈希表,采用h(K)=K%7计算哈希地址,则哈希地址等于3的元素个数为( )。",
+    "options": {
+      "A": "1",
+      "B": "2",
+      "C": "3",
+      "D": "4"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q77",
+    "explanation": ""
+  },
+  {
+    "id": 78,
+    "q_type": "single",
+    "question": "若根据查找表建立长度为m的哈希表,采用线性探测法处理冲突,假定对一个元素第一次计算的哈希地址为d,则下一次的哈希地址为( )。",
+    "options": {
+      "A": "d",
+      "B": "d+1",
+      "C": "(d+1)/m",
+      "D": "(d+1)%m"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q78",
+    "explanation": ""
+  },
+  {
+    "id": 79,
+    "q_type": "single",
+    "question": "设散列地址空间为0~m-1,k为关键字,用p去除k,将所得的余数作为k的散列地址,即H(k)=k%p。为了减少发生冲突的频率,一般取p为( )。",
+    "options": {
+      "A": "小于m的最大奇数",
+      "B": "小于m的最大偶数",
+      "C": "m",
+      "D": "小于m的最大素数"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q79",
+    "explanation": ""
+  },
+  {
+    "id": 80,
+    "q_type": "single",
+    "question": "设哈希表长m=14，哈希函数H(key)=key%11。\n表中已经有4个结点：addr(15)=4，addr(38)=5，addr(61)=6，addr(84)=7\n其余地址为空，若采用二次探测再散列(平方探查法)解决冲突，关键字为49的结点的地址为        。",
+    "options": {
+      "A": "8",
+      "B": "3",
+      "C": "5",
+      "D": "9"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q80",
+    "explanation": ""
+  },
+  {
+    "id": 81,
+    "q_type": "single",
+    "question": "在索引查找中,若用于保存数据元素的主表的长度为n,它被均分为k个子表,每个子表的长度均为n/k,则索引查找的平均查找长度为( )。",
+    "options": {
+      "A": "n+k",
+      "B": "k+n/k",
+      "C": "(k+n/k)/2",
+      "D": "(k+n/k)/2+1"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q81",
+    "explanation": ""
+  },
+  {
+    "id": 82,
+    "q_type": "single",
+    "question": "下面关于折半查找的叙述正确的是（ ）。",
+    "options": {
+      "A": "表必须有序，表可以顺序方式存储，也可以链式方式存储",
+      "B": "表必须有序，而且表中数据必须是整型、实型或字符型",
+      "C": "表必须有序，而且只能从小到大排序",
+      "D": "表必须有序，且表只能以顺序方式存储"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q82",
+    "explanation": ""
+  },
+  {
+    "id": 83,
+    "q_type": "single",
+    "question": "在索引查找中，若用于保存数据元素的主表的长度为144，它被均分为12子表，每个子表的长度均为12，则索引查找的平均查找长度为（ ）。",
+    "options": {
+      "A": "13",
+      "B": "24",
+      "C": "12",
+      "D": "79"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q83",
+    "explanation": ""
+  },
+  {
+    "id": 84,
+    "q_type": "single",
+    "question": "采用顺序查找方法查找长度为n的线性表时,每个元素的平均查找长度为( )",
+    "options": {
+      "A": "n",
+      "B": "n/2",
+      "C": "(n+1)/2",
+      "D": "(n-1)/2"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q84",
+    "explanation": ""
+  },
+  {
+    "id": 85,
+    "q_type": "single",
+    "question": "在平衡二叉树中插入一个结点后造成了不平衡,设最低的不平衡结点为A,并已知A的左孩子的平衡因子为0,右孩子的平衡因子为1,则应作( )型调整以使其平衡。",
+    "options": {
+      "A": "LL",
+      "B": "LR",
+      "C": "RL",
+      "D": "RR"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q85",
+    "explanation": ""
+  },
+  {
+    "id": 86,
+    "q_type": "single",
+    "question": "堆是满足一定条件的()",
+    "options": {
+      "A": "队列",
+      "B": "完全二叉树",
+      "C": "线性表",
+      "D": "栈"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q86",
+    "explanation": ""
+  },
+  {
+    "id": 87,
+    "q_type": "single",
+    "question": "在下面的排序方法中,辅助空间为O(n)的是( )。",
+    "options": {
+      "A": "希尔排序",
+      "B": "堆排序",
+      "C": "选择排序",
+      "D": "归并排序"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q87",
+    "explanation": ""
+  },
+  {
+    "id": 88,
+    "q_type": "single",
+    "question": "在对n个元素进行快速排序的过程中，若每次划分得到的左、右两个子区间中元素的个数相等或只差一个，则整个排序过程得到的含两个元素的区间个数大致为（ ）。",
+    "options": {
+      "A": "n",
+      "B": "n/2",
+      "C": "log2n",
+      "D": "2n"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q88",
+    "explanation": ""
+  },
+  {
+    "id": 89,
+    "q_type": "single",
+    "question": "一组记录的排序码为26,48,16,35,78,82,22,40,37,72.,其中含有5个长度为2的有序表,按归并排序的方法对该序列进行一趟归并后的结果为 。",
+    "options": {
+      "A": "16, 26,35,48, 22,40, 78,82, 37,72",
+      "B": "16, 26,35,48, 78,82, 22, 37,40,72",
+      "C": "16, 26,48,35, 78,82, 22, 37,40,72",
+      "D": "16, 26,35,48, 78, 22, 37,40,72,82"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q89",
+    "explanation": ""
+  },
+  {
+    "id": 90,
+    "q_type": "single",
+    "question": "若对n个元素进行直接插入排序,则进行任一趟排序的过程中,为寻找插入位置而需要的时间复杂性为( )。",
+    "options": {
+      "A": "O(1)",
+      "B": "O(n)",
+      "C": "O(n 2)",
+      "D": "O(log 2n)"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q90",
+    "explanation": ""
+  },
+  {
+    "id": 91,
+    "q_type": "single",
+    "question": "若对n个元素进行直接插入排序,在进行第i趟排序时,为寻找插入位置最多需要进行( )次元素的比较,假定第0号元素放有待查的键值。",
+    "options": {
+      "A": "i",
+      "B": "i-1",
+      "C": "i+1",
+      "D": "1"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q91",
+    "explanation": ""
+  },
+  {
+    "id": 92,
+    "q_type": "single",
+    "question": "某内排序方法的稳定性是指（ ）。",
+    "options": {
+      "A": "该排序算法不允许有相同的关键字记录",
+      "B": "该排序算法允许有相同的关键字记录",
+      "C": "平均时间为O(nlogn)的排序方法",
+      "D": "以上都不对"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q92",
+    "explanation": ""
+  },
+  {
+    "id": 93,
+    "q_type": "single",
+    "question": "在对n个元素进行直接插入排序的过程中,算法的空间复杂性为( )。",
+    "options": {
+      "A": "O(1)",
+      "B": "O(log 2n)",
+      "C": "O(n 2)",
+      "D": "O(nlog 2n)"
+    },
+    "answer": "A",
+    "source": "questions.docx#Q93",
+    "explanation": ""
+  },
+  {
+    "id": 94,
+    "q_type": "single",
+    "question": "设一组初始记录关键字序列为(50,40,95,20,15,70,60,45),则以增量d=4的一趟希尔排序结束后前4条记录关键字为( )。",
+    "options": {
+      "A": "40,50,20,95",
+      "B": "15,40,60,20",
+      "C": "15,20,40,45",
+      "D": "45,40,15,20"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q94",
+    "explanation": ""
+  },
+  {
+    "id": 95,
+    "q_type": "single",
+    "question": "在对n个元素进行冒泡排序的过程中,最好情况下的时间复杂性为( )。",
+    "options": {
+      "A": "O(1)",
+      "B": "O(log 2n)",
+      "C": "O(n 2)",
+      "D": "O(n)"
+    },
+    "answer": "D",
+    "source": "questions.docx#Q95",
+    "explanation": ""
+  },
+  {
+    "id": 96,
+    "q_type": "single",
+    "question": "假定对元素序列(7,3,5,9,1,12)进行堆排序,并且采用小根堆,则由初始数据构成的初始堆为( )。",
+    "options": {
+      "A": "1,3,5,7,9,12",
+      "B": "1,3,5,9,7,12",
+      "C": "1,5,3,7,9,12",
+      "D": "1,5,3,9,12,7"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q96",
+    "explanation": ""
+  },
+  {
+    "id": 97,
+    "q_type": "single",
+    "question": "下列排序算法中( )不能保证每趟排序至少能将一个元素放到其最终的位置上。",
+    "options": {
+      "A": "快速排序",
+      "B": "shell排序",
+      "C": "堆排序",
+      "D": "冒泡排序"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q97",
+    "explanation": ""
+  },
+  {
+    "id": 98,
+    "q_type": "single",
+    "question": "在对n个元素进行快速排序的过程中,若每次划分得到的左、右两个子区间中元素的个数相等或只差一个,则整个排序过程得到的含两个或两个元素的区间个数大致为( )。",
+    "options": {
+      "A": "n",
+      "B": "n/2",
+      "C": "log 2n",
+      "D": "2n"
+    },
+    "answer": "B",
+    "source": "questions.docx#Q98",
+    "explanation": ""
+  },
+  {
+    "id": 99,
+    "q_type": "single",
+    "question": "在对n个元素进行快速排序的过程中,最好情况下需要进行( )趟。",
+    "options": {
+      "A": "n",
+      "B": "n/2",
+      "C": "log 2n",
+      "D": "2n"
+    },
+    "answer": "C",
+    "source": "questions.docx#Q99",
+    "explanation": ""
+  },
+  {
+    "id": 100,
+    "q_type": "single",
+    "question": "设一组初始记录关键字序列为(25,50,15,35,80,85,20,40,36,70),其中含有5个长度为2的有序子表,则用归并排序的方法对该记录关键字序列进行一趟归并后的结果为( )。",
+    "options": {
+      "A": "15,25,35,50,20,40,80,85,36,70",
+      "B": "15,25,35,50,80,20,85,40,70,36",
+      "C": "15,25,35,50,80,85,20,36,40,70",
+      "D": "15,25,35,50,80,20,36,40,70,85"
+    },
+    "answer": "A\n二、 填空题 （共40题）",
+    "source": "questions.docx#Q100",
+    "explanation": ""
+  },
+  {
+    "id": 101,
+    "q_type": "blank",
+    "question": "数据元素之间的关系在计算机中的表示有两种不同的表示方法,即____和____,从而得到两种不同的存储结构____和____。",
+    "options": {},
+    "answer": "第1空:\n顺序映像\n第2空:\n非顺序映像\n第3空:\n顺序存储结构\n第4空:\n链式存储结构",
+    "source": "questions.docx#Q101",
+    "explanation": ""
+  },
+  {
+    "id": 102,
+    "q_type": "blank",
+    "question": "数据结构中评价算法的两个重要指标是____和____。",
+    "options": {},
+    "answer": "第1空:时间复杂度\n第2空:空间复杂度",
+    "source": "questions.docx#Q102",
+    "explanation": ""
+  },
+  {
+    "id": 103,
+    "q_type": "blank",
+    "question": "一个算法的时间复杂度为(n3+n2log2n+14n)/n2,其数量级表示为____。",
+    "options": {},
+    "answer": "第1空:\nn",
+    "source": "questions.docx#Q103",
+    "explanation": ""
+  },
+  {
+    "id": 104,
+    "q_type": "blank",
+    "question": "算法的五个重要特性是:____、____、____、____、____。",
+    "options": {},
+    "answer": "第1空:确定性\n第2空:有限性\n第3空:输入\n第4空:输出\n第5空:可行性",
+    "source": "questions.docx#Q104",
+    "explanation": ""
+  },
+  {
+    "id": 105,
+    "q_type": "short",
+    "question": "衡量算法正确性的标准通常是        。",
+    "options": {},
+    "answer": "第1空:\n程序对于精心设计的典型合法数据输入能得出符合要求的结果",
+    "source": "questions.docx#Q105",
+    "explanation": ""
+  },
+  {
+    "id": 106,
+    "q_type": "blank",
+    "question": "在线性表的顺序存储中,元素之间的逻辑关系是通过____决定的;在线性表的链式存储中,元素之间的逻辑关系是通过____决定的。",
+    "options": {},
+    "answer": "第1空:物理存储位置\n第2空:链域的指针值",
+    "source": "questions.docx#Q106",
+    "explanation": ""
+  },
+  {
+    "id": 107,
+    "q_type": "blank",
+    "question": "线性表是一种典型的____结构。",
+    "options": {},
+    "answer": "第1空:\n线性",
+    "source": "questions.docx#Q107",
+    "explanation": ""
+  },
+  {
+    "id": 108,
+    "q_type": "blank",
+    "question": "线性表的就地逆置____\n【问题描述】\n以顺序存储结构实现线性表的就地逆置,并将结果输出。线性表的就地逆置就是在原表的存储空间内将线性表____逆置为____。",
+    "options": {},
+    "answer": "第1空:exp2-2.cpp\n第2空:a 1,a 2,a 3,…,a n\n第3空:a n,a n-1,…,a 2,a 1",
+    "source": "questions.docx#Q108",
+    "explanation": ""
+  },
+  {
+    "id": 109,
+    "q_type": "blank",
+    "question": "在一个长度为n的顺序表的第i个元素之前插入一个元素,需要后移____个元素。",
+    "options": {},
+    "answer": "第1空:\nn-i+1",
+    "source": "questions.docx#Q109",
+    "explanation": ""
+  },
+  {
+    "id": 110,
+    "q_type": "short",
+    "question": "在单链表中设置头结点的作用是        。",
+    "options": {},
+    "answer": "第1空:\n使空表和非空表统一;算法处理一致",
+    "source": "questions.docx#Q110",
+    "explanation": ""
+  },
+  {
+    "id": 111,
+    "q_type": "blank",
+    "question": "一个带头结点的循环双链表L(结点个数大于2),插入一个结点,需要修改____个指针域,删除一个结点,需要修改____个指针域。",
+    "options": {},
+    "answer": "第1空:4\n第2空:4",
+    "source": "questions.docx#Q111",
+    "explanation": ""
+  },
+  {
+    "id": 112,
+    "q_type": "blank",
+    "question": "带表头结点的空循环双向链表的长度等于____。\n注意",
+    "options": {},
+    "answer": "第1空:每空只要填入一个数",
+    "source": "questions.docx#Q112",
+    "explanation": ""
+  },
+  {
+    "id": 113,
+    "q_type": "blank",
+    "question": "顺序表中逻辑上相邻的元素的物理位置____紧邻。单链表中逻辑上相邻的元素的物理位置____紧邻。",
+    "options": {},
+    "answer": "第1空:必定\n第2空:不一定",
+    "source": "questions.docx#Q113",
+    "explanation": ""
+  },
+  {
+    "id": 114,
+    "q_type": "blank",
+    "question": "在一个长度为n的顺序表(用数组实现的表)的任一位置插入一个新元素时,在等概率插入的情况下,元素平均移动次数为____。",
+    "options": {},
+    "answer": "第1空:\nn/2",
+    "source": "questions.docx#Q114",
+    "explanation": ""
+  },
+  {
+    "id": 115,
+    "q_type": "blank",
+    "question": "顺序表中逻辑上相邻的元素,物理位置____相邻,单链表中逻辑上相邻的元素,物理位置____相邻。",
+    "options": {},
+    "answer": "第1空:\n一定\n第2空:\n不一定",
+    "source": "questions.docx#Q115",
+    "explanation": ""
+  },
+  {
+    "id": 116,
+    "q_type": "blank",
+    "question": "向一个循环队列中插入元素时,需要向所指位置写入新插入的元素,然后再移动____。",
+    "options": {},
+    "answer": "第1空:\n队尾指针",
+    "source": "questions.docx#Q116",
+    "explanation": ""
+  },
+  {
+    "id": 117,
+    "q_type": "blank",
+    "question": "用具有n个元素的一维数组存储一个循环队列,则其队首指针总是指向队首元素的____,该循环队列的最大长度为____。\n注意:所有标点符号均为英文标点符号;符号两侧无空格",
+    "options": {},
+    "answer": "第1空:前一个位置\n第2空:n-1",
+    "source": "questions.docx#Q117",
+    "explanation": ""
+  },
+  {
+    "id": 118,
+    "q_type": "blank",
+    "question": "简述以下算法的功能(栈和队列的元素类型均为int)____.\nvoid algo3(Queue &Q){\nStack S;\nint d;\nInitStack(S);\nwhile(!QueueEmpty(Q))\n{\nDeQueue(Q, d);\nPush(S, d);\n}\nwhile(!StackEmpty(S)) {\nPop(S, d);\nEnQueue(Q, d);\n}\n}",
+    "options": {},
+    "answer": "第1空:队列逆置",
+    "source": "questions.docx#Q118",
+    "explanation": ""
+  },
+  {
+    "id": 119,
+    "q_type": "blank",
+    "question": "表达式求值是____应用的一个典型例子。",
+    "options": {},
+    "answer": "第1空:\n栈",
+    "source": "questions.docx#Q119",
+    "explanation": ""
+  },
+  {
+    "id": 120,
+    "q_type": "blank",
+    "question": "用S表示入栈操作,X表示出栈操作,若元素入栈的顺序为1234,为了得到1342出栈顺序,相应的S和X的操作串为____。",
+    "options": {},
+    "answer": "第1空:\nSXSSXSXX",
+    "source": "questions.docx#Q120",
+    "explanation": ""
+  },
+  {
+    "id": 121,
+    "q_type": "short",
+    "question": "已知用一维数组存放的一棵完全二叉树：ABCDEFGHIJKL，写出该二叉树的先序        、中序        和后序        。",
+    "options": {},
+    "answer": "第1空:\nABDHIEJKCFLG\n第2空:\nHDIBJEKALFCG\n第3空:\nHIDJKEBLFGCA",
+    "source": "questions.docx#Q121",
+    "explanation": ""
+  },
+  {
+    "id": 122,
+    "q_type": "blank",
+    "question": "设高度为h的二叉树中只有度为0和度为2的结点,则此类二叉树中所包含的结点数至少为____。",
+    "options": {},
+    "answer": "第1空:\n2h-1",
+    "source": "questions.docx#Q122",
+    "explanation": ""
+  },
+  {
+    "id": 123,
+    "q_type": "blank",
+    "question": "由分别带权为3,9,6,2,5的五个叶子结点构成一棵霍夫曼树,则带权路径长度为____。",
+    "options": {},
+    "answer": "第1空:\n55",
+    "source": "questions.docx#Q123",
+    "explanation": ""
+  },
+  {
+    "id": 124,
+    "q_type": "blank",
+    "question": "在一棵二叉排序树中,按____遍历得到的结点序列是一个有序序列。",
+    "options": {},
+    "answer": "第1空:\n中序",
+    "source": "questions.docx#Q124",
+    "explanation": ""
+  },
+  {
+    "id": 125,
+    "q_type": "blank",
+    "question": "空树是指____,最小的树是指____。",
+    "options": {},
+    "answer": "第1空:\n结点数为0的树\n第2空:\n只有一个根结点的树",
+    "source": "questions.docx#Q125",
+    "explanation": ""
+  },
+  {
+    "id": 126,
+    "q_type": "blank",
+    "question": "G是一个非连通无向图,共有28条边,则该图至少有____个顶点。",
+    "options": {},
+    "answer": "第1空:\n9",
+    "source": "questions.docx#Q126",
+    "explanation": ""
+  },
+  {
+    "id": 127,
+    "q_type": "blank",
+    "question": "已知一个无向图的邻接矩阵如下所示,则从顶点A出发按深度优先遍历得到的顶点序列为____,按广度优先搜索遍历得到的顶点序列为____。",
+    "options": {},
+    "answer": "第1空:\nABCDFE\n第2空:\nABCEFD",
+    "source": "questions.docx#Q127",
+    "explanation": ""
+  },
+  {
+    "id": 128,
+    "q_type": "blank",
+    "question": "对于一个具有n个顶点和e条边的连通图,其生成树中的顶点数和边数分别为n和____。",
+    "options": {},
+    "answer": "第1空:\nn-1",
+    "source": "questions.docx#Q128",
+    "explanation": ""
+  },
+  {
+    "id": 129,
+    "q_type": "blank",
+    "question": "在有向图的邻接表和逆邻接表表示中,每个顶点邻接表分别链接着该顶点的所有____和____。",
+    "options": {},
+    "answer": "第1空:\n出边\n第2空:\n入边",
+    "source": "questions.docx#Q129",
+    "explanation": ""
+  },
+  {
+    "id": 130,
+    "q_type": "blank",
+    "question": "已知一个无向图如下所示,在该图的最小生成树中,各边的权值之和为____。",
+    "options": {},
+    "answer": "第1空:\n20",
+    "source": "questions.docx#Q130",
+    "explanation": ""
+  },
+  {
+    "id": 131,
+    "q_type": "blank",
+    "question": "向一棵二叉排序树中插入一个元素时,若元素的值小于根结点的值,则接着向根结点的____插入,若元素的值大于根结点的值,则接着向根结点的____插入。",
+    "options": {},
+    "answer": "第1空:\n左子树\n第2空:\n右子树",
+    "source": "questions.docx#Q131",
+    "explanation": ""
+  },
+  {
+    "id": 132,
+    "q_type": "blank",
+    "question": "散列表表长m,在散列函数H(key)=key%p中,p应取____。",
+    "options": {},
+    "answer": "第1空:小于表长m的最大素数",
+    "source": "questions.docx#Q132",
+    "explanation": ""
+  },
+  {
+    "id": 133,
+    "q_type": "blank",
+    "question": "以顺序查找方法从长度为n的顺序表或单链表中查找一个元素时,平均查找长度为____,时间复杂度为____。",
+    "options": {},
+    "answer": "第1空:\n(n+1)/2\n第2空:\nO(n)",
+    "source": "questions.docx#Q133",
+    "explanation": ""
+  },
+  {
+    "id": 134,
+    "q_type": "blank",
+    "question": "根据n个元素建立一棵二叉排序树的时间复杂度大致为____。",
+    "options": {},
+    "answer": "第1空:\nO(nlog2n)",
+    "source": "questions.docx#Q134",
+    "explanation": ""
+  },
+  {
+    "id": 135,
+    "q_type": "blank",
+    "question": "设散列表的地址区间为[0,16],散列函数为H(Key)=Key%17。采用线性探测法处理冲突,并将关键字序列{ 26,25,72,38,8,18,59 }依次存储到散列表中。元素59存放在散列表中的地址是:____",
+    "options": {},
+    "answer": "第1空:11",
+    "source": "questions.docx#Q135",
+    "explanation": ""
+  },
+  {
+    "id": 136,
+    "q_type": "blank",
+    "question": "若对一组记录(76,38,62,53,80,74,83,65,85)进行堆排序,已知除第一个元素外,以其余元素为根的结点都已是堆,则对第一个元素进行筛运算时,它将最终被筛到下标为____的位置。",
+    "options": {},
+    "answer": "第1空:\n8",
+    "source": "questions.docx#Q136",
+    "explanation": ""
+  },
+  {
+    "id": 137,
+    "q_type": "blank",
+    "question": "假定一组记录为(46,79,56,38,40,80,46,75,28,46),对其进行归并排序的过程中,第二趟归并后的子表个数为____。",
+    "options": {},
+    "answer": "第1空:\n3",
+    "source": "questions.docx#Q137",
+    "explanation": ""
+  },
+  {
+    "id": 138,
+    "q_type": "blank",
+    "question": "假定一组记录为(46, 79, 56, 38, 40, 84, 43)，对其进行快速排序的过程中，共需 要 趟排序。",
+    "options": {},
+    "answer": "第1空:5；",
+    "source": "questions.docx#Q138",
+    "explanation": ""
+  },
+  {
+    "id": 139,
+    "q_type": "blank",
+    "question": "快速排序在平均情况下的时间复杂性为________,在最坏情况下的时间复杂性为____。",
+    "options": {},
+    "answer": "第1空:\nO(nlog2n)(2为底)\n第2空:\nO(n^2)",
+    "source": "questions.docx#Q139",
+    "explanation": ""
+  },
+  {
+    "id": 140,
+    "q_type": "blank",
+    "question": "具有5层节点的平衡二叉树至少有____个节点。",
+    "options": {},
+    "answer": "第1空:12\n三、 判断题 （共50题）",
+    "source": "questions.docx#Q140",
+    "explanation": ""
+  },
+  {
+    "id": 141,
+    "q_type": "tf",
+    "question": "顺序存储方式的优点是:存储密度大,且插入、删除运算效率高。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q141",
+    "explanation": ""
+  },
+  {
+    "id": 142,
+    "q_type": "tf",
+    "question": "数据的逻辑结构说明数据元素之间的顺序关系,它依赖于计算机的存储结构。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q142",
+    "explanation": ""
+  },
+  {
+    "id": 143,
+    "q_type": "tf",
+    "question": "算法可以用不同的语言描述,如果用C语言或PASCAL语言等高级语言来描述,则算法实际上就是程序了。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q143",
+    "explanation": ""
+  },
+  {
+    "id": 144,
+    "q_type": "tf",
+    "question": "数据结构的基本操作设置的最重要准则是,实现应用程序与存储结构的独立。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q144",
+    "explanation": ""
+  },
+  {
+    "id": 145,
+    "q_type": "tf",
+    "question": "算法分析的两个主要方面是时间复杂度和空间复杂度的分析。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q145",
+    "explanation": ""
+  },
+  {
+    "id": 146,
+    "q_type": "tf",
+    "question": "算法可以用不同的语言描述,如果用C语言或PASCAL语言等高级语言来描述,则算法实际上就是程序了。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q146",
+    "explanation": ""
+  },
+  {
+    "id": 147,
+    "q_type": "tf",
+    "question": "线性表采用链表方式和顺序表方式存储,执行插入和删除运算的时间复杂度都是O(n),因此两种存储方式的插入、删除运算所花费的时间相同。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q147",
+    "explanation": ""
+  },
+  {
+    "id": 148,
+    "q_type": "tf",
+    "question": "在顺序表中取出第i个元素所花费的时间与i成正比。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q148",
+    "explanation": ""
+  },
+  {
+    "id": 149,
+    "q_type": "tf",
+    "question": "循环链表不是线性表。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q149",
+    "explanation": ""
+  },
+  {
+    "id": 150,
+    "q_type": "tf",
+    "question": "顺序存储方式的优点是存储密度大,且插入、删除运算效率高。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q150",
+    "explanation": ""
+  },
+  {
+    "id": 151,
+    "q_type": "tf",
+    "question": "链表中的头结点仅起到标识的作用。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q151",
+    "explanation": ""
+  },
+  {
+    "id": 152,
+    "q_type": "tf",
+    "question": "线性表只能用顺序存储结构实现。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q152",
+    "explanation": ""
+  },
+  {
+    "id": 153,
+    "q_type": "tf",
+    "question": "任何一个递归过程都可以转换成非递归过程。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q153",
+    "explanation": ""
+  },
+  {
+    "id": 154,
+    "q_type": "tf",
+    "question": "在向顺序栈压入新元素时,要先按栈顶指针指示的位置存入新元素再移动栈顶指针。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q154",
+    "explanation": ""
+  },
+  {
+    "id": 155,
+    "q_type": "tf",
+    "question": "只有那种使用了局部变量的递归过程在转换成非递归过程时才必须使用栈。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q155",
+    "explanation": ""
+  },
+  {
+    "id": 156,
+    "q_type": "tf",
+    "question": "若让元素1, 2, 3依次进栈,则出栈次序3, 1, 2是不可能出现的情况。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q156",
+    "explanation": ""
+  },
+  {
+    "id": 157,
+    "q_type": "tf",
+    "question": "链式栈与顺序栈相比,一个明显的优点是通常不会出现栈满的情况。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q157",
+    "explanation": ""
+  },
+  {
+    "id": 158,
+    "q_type": "tf",
+    "question": "两个栈共享一片连续内存空间时,为提高内存利用率,减少溢出机会,应把两个栈的栈底分别设在这片内存空间的两端。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q158",
+    "explanation": ""
+  },
+  {
+    "id": 159,
+    "q_type": "tf",
+    "question": "栈是实现过程和函数等子程序所必需的结构。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q159",
+    "explanation": ""
+  },
+  {
+    "id": 160,
+    "q_type": "tf",
+    "question": "在用单链表表示的链式队列中,队头在链表的链尾位置。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q160",
+    "explanation": ""
+  },
+  {
+    "id": 161,
+    "q_type": "tf",
+    "question": "循环队列也存在空间溢出问题。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q161",
+    "explanation": ""
+  },
+  {
+    "id": 162,
+    "q_type": "tf",
+    "question": "循环队列通常用指针来实现队列的头尾相接。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q162",
+    "explanation": ""
+  },
+  {
+    "id": 163,
+    "q_type": "tf",
+    "question": "霍夫曼树的总结点个数(多于1时)不能为偶数。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q163",
+    "explanation": ""
+  },
+  {
+    "id": 164,
+    "q_type": "tf",
+    "question": "树的子树是无序的。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q164",
+    "explanation": ""
+  },
+  {
+    "id": 165,
+    "q_type": "tf",
+    "question": "后序遍历和中序遍历与该树对应的二叉树,其结果不同。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q165",
+    "explanation": ""
+  },
+  {
+    "id": 166,
+    "q_type": "tf",
+    "question": "若有一个结点是某二叉树子树中序遍历序列中的最后一个结点,则它必是该子树前序遍历序列中的最后一个结点。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q166",
+    "explanation": ""
+  },
+  {
+    "id": 167,
+    "q_type": "tf",
+    "question": "由树转换成二叉树,其根节点的右子树总是空的。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q167",
+    "explanation": ""
+  },
+  {
+    "id": 168,
+    "q_type": "tf",
+    "question": "有向图的邻接矩阵一定不是对称矩阵。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q168",
+    "explanation": ""
+  },
+  {
+    "id": 169,
+    "q_type": "tf",
+    "question": "若图G为连通图,则G必有唯一的一棵最小生成树。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q169",
+    "explanation": ""
+  },
+  {
+    "id": 170,
+    "q_type": "tf",
+    "question": "用邻接矩阵存储一个图时,在不考虑压缩存储的情况下,所占用的存储空间大小与图中结点个数有关,而与图的边数无关。( )",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q170",
+    "explanation": ""
+  },
+  {
+    "id": 171,
+    "q_type": "tf",
+    "question": "无向图的邻接矩阵一定是对称矩阵,有向图的邻接矩阵一定是非对称矩阵。( )",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q171",
+    "explanation": ""
+  },
+  {
+    "id": 172,
+    "q_type": "tf",
+    "question": "强连通图的各顶点间均可达。( )",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q172",
+    "explanation": ""
+  },
+  {
+    "id": 173,
+    "q_type": "tf",
+    "question": "邻接多重表是无向图的一种链式存储方法。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q173",
+    "explanation": ""
+  },
+  {
+    "id": 174,
+    "q_type": "tf",
+    "question": "一个网(带权图)都有唯一的最小生成树。( )",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q174",
+    "explanation": ""
+  },
+  {
+    "id": 175,
+    "q_type": "tf",
+    "question": "有n个顶点的无向图, 采用邻接矩阵表示, 图中的边数等于邻接矩阵中非零元素之和的一半。( )",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q175",
+    "explanation": ""
+  },
+  {
+    "id": 176,
+    "q_type": "tf",
+    "question": "AOE网中一定只有一条关键路径。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q176",
+    "explanation": ""
+  },
+  {
+    "id": 177,
+    "q_type": "tf",
+    "question": "关键路径是时间结点网络中从源点到汇点的最长路径。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q177",
+    "explanation": ""
+  },
+  {
+    "id": 178,
+    "q_type": "tf",
+    "question": "广度遍历生成树描述了从起点到各顶点的最短路径。( )",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q178",
+    "explanation": ""
+  },
+  {
+    "id": 179,
+    "q_type": "tf",
+    "question": "N个结点的二叉排序树有多种,其中树高最小的二叉树是最佳的。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q179",
+    "explanation": ""
+  },
+  {
+    "id": 180,
+    "q_type": "tf",
+    "question": "散列法存储的基本思想是有关键码的值决定数据的存储地址。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q180",
+    "explanation": ""
+  },
+  {
+    "id": 181,
+    "q_type": "tf",
+    "question": "在散列检索中,“比较”操作一般也是不可避免的。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q181",
+    "explanation": ""
+  },
+  {
+    "id": 182,
+    "q_type": "tf",
+    "question": "就平均查找长度而言,分块查找最小,折半查找次之,顺序查找最大。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q182",
+    "explanation": ""
+  },
+  {
+    "id": 183,
+    "q_type": "tf",
+    "question": "最佳二叉树是AVL(平衡二叉树)。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q183",
+    "explanation": ""
+  },
+  {
+    "id": 184,
+    "q_type": "tf",
+    "question": "仅基于比较的算法能得到的最好的“最坏时间复杂度”是O(NlogN)。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q184",
+    "explanation": ""
+  },
+  {
+    "id": 185,
+    "q_type": "tf",
+    "question": "快速排序是稳定的算法。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q185",
+    "explanation": ""
+  },
+  {
+    "id": 186,
+    "q_type": "tf",
+    "question": "若待排序记录已从升序或降序有序,则快速排序的时间效率最高。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q186",
+    "explanation": ""
+  },
+  {
+    "id": 187,
+    "q_type": "tf",
+    "question": "排序的稳定性是指排序算法中的比较次数保持不变,且算法能够终止。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q187",
+    "explanation": ""
+  },
+  {
+    "id": 188,
+    "q_type": "tf",
+    "question": "冒泡排序和快速排序都是基于交换两个逆序元素的排序方法,冒泡排序算法的最坏时间复杂性是O(n 2),而快速排序算法的最坏时间复杂度是O(nlog 2n),所以快速排序比冒泡排序算法效率最高。",
+    "options": {},
+    "answer": "错误",
+    "source": "questions.docx#Q188",
+    "explanation": ""
+  },
+  {
+    "id": 189,
+    "q_type": "tf",
+    "question": "当待排序的元素很大时,为了交换元素的位置,移动元素要占用较多的时间,这是影响时间复杂度的主要因素。",
+    "options": {},
+    "answer": "正确",
+    "source": "questions.docx#Q189",
+    "explanation": ""
+  },
+  {
+    "id": 190,
+    "q_type": "blank",
+    "question": "对N个不同的数据采用冒泡排序进行从大到小的排序,当元素基本有序时交换元素次数肯定最多。",
+    "options": {},
+    "answer": "错误\n四、 简答题 （共20题）",
+    "source": "questions.docx#Q190",
+    "explanation": ""
+  },
+  {
+    "id": 191,
+    "q_type": "short",
+    "question": "对于线性表的两种存储结构,如果有n个线性表同时并存,并且在处理过程中各表的长度会发生动态变化,线性表的总数也会自行改变,在此情况下,应选用哪一种存储结构?为什么?",
+    "options": {},
+    "answer": "应选用链式存储结构,因为链式存储结构是用一组任意的存储单元依次存储线性表中的各元素,这里存储单元可以是连续的,也可以是不连续的。对于元素的删除或插入操作,这种存储结构不需要移动元素,只修改指针即可,所以很容易实现表容量的扩充。",
+    "source": "questions.docx#Q191",
+    "explanation": ""
+  },
+  {
+    "id": 192,
+    "q_type": "blank",
+    "question": "熟悉线性表的基本运算在链式存储结构上的实现。",
+    "options": {},
+    "answer": "正确答案：",
+    "source": "questions.docx#Q192",
+    "explanation": ""
+  },
+  {
+    "id": 193,
+    "q_type": "short",
+    "question": "线性表的逆置(exp3-3.c)\n【问题描述】以单链表存储结构实现线性表的就地逆置,并将结果输出。线性表的就地逆置就是在原表的存储空间内将线性表(a 1,a 2,a 3,…,a n)逆置为(a n,a n-1,…,a 2,a 1)。",
+    "options": {},
+    "answer": "296、若让元素1,2,3,4,5依次进栈,则出栈次序不可能出现在( )种情况。\nA、 5,4,3,2,1\nB、 2,1,5,4,3\nC、 4,3,1,2,5\nD、 2,3,5,4,1 C",
+    "source": "questions.docx#Q193",
+    "explanation": ""
+  },
+  {
+    "id": 194,
+    "q_type": "short",
+    "question": "已知由一个线性链表表示的线性表中含有三类字符的数据元素(如:字母字符、数字字符和其他字符),试编写算法将该线性表分割为三个循环链表,其中每个循环链表表示的线性表中均只含一类字符。",
+    "options": {},
+    "answer": "// 将单链表L划分成3个单循环链表\nStatus ListDivideInto3CL(LinkList &L,LinkList &s1,LinkList &s2,LinkList &s3)\n{\nLinkList p,q,pt1,pt2,pt3;\np=L->next;\npt1=s1;\npt2=s2;\npt3=s3;\nwhile(p){\nif(p->data>='0' && p->data<='9'){\nq=p;\np=p->next;\nq->next=pt1->next;\npt1->next=q;\npt1=pt1->next;\n}\nelse\nif((p->data>='A' && p->data<='Z') || (p->data>='a' && p->data<='z')){\nq=p;\np=p->next;\nq->next=pt2->next;\npt2->next=q;\npt2=pt2->next;\n}\nelse{\nq=p;\np=p->next;\nq->next=pt3->next;\npt3->next=q;\npt3=pt3->next;\n}\n}\nq=L;\nfree(q);\nreturn OK;\n}",
+    "source": "questions.docx#Q194",
+    "explanation": ""
+  },
+  {
+    "id": 195,
+    "q_type": "short",
+    "question": "画出具有三个结点的二叉树的所有不同形态。",
+    "options": {},
+    "answer": "如图所示,具有3个结点的二叉树有以下五种形态。",
+    "source": "questions.docx#Q195",
+    "explanation": ""
+  },
+  {
+    "id": 196,
+    "q_type": "short",
+    "question": "如果一棵树有n1个度为1的结点, 有n2个度为2的结点, … , nm个度为m的结点, 试问有多少个度为0的结点? 试推导之。",
+    "options": {},
+    "answer": "总结点数 n = n0 + n1 + n2 + … + nm\n总分支数 e = n-1 = n0 + n1 + n2 + … + nm-1\n= m*nm + (m-1)*nm-1 + … + 2*n2 + n1\n则有",
+    "source": "questions.docx#Q196",
+    "explanation": ""
+  },
+  {
+    "id": 197,
+    "q_type": "short",
+    "question": "列出下图所示树的叶结点、分支结点和每个结点的层次。",
+    "options": {},
+    "answer": "二叉树的叶结点有⑥、⑧、⑨。分支结点有①、②、③、④、⑤、⑦。 结点①的层次为0;结点②、③的层次为1;结点④、⑤、⑥的层次为2;结点⑦、⑧的层次为3;结点⑨的层次为4。",
+    "source": "questions.docx#Q197",
+    "explanation": ""
+  },
+  {
+    "id": 198,
+    "q_type": "blank",
+    "question": "给出如图所示的森林的先根、后根遍历序列,画出该森林对应的二叉树。\n先根遍历:ABCDEFGHIJKLMNO\n后根遍历:BDEFCAHIJGKNOML",
+    "options": {},
+    "answer": "对应的二叉树如图所示。",
+    "source": "questions.docx#Q198",
+    "explanation": ""
+  },
+  {
+    "id": 199,
+    "q_type": "short",
+    "question": "已知一棵树边的集合为{<i,m>,<i,n>,<e,i>,<b,e>,<b,d>,<a,b>,<g,j>,<g,k>,<c,g>,<c,f>,<g,l>,<c,h>,<a,c>},请画出这棵树,并回答下列问题：\n（1）哪个是根结点？\n（2）哪些是叶子结点？\n（3）哪个是结点g的双亲？\n（4）哪些是结点g的祖先？\n（5）哪些是结点g的孩子？\n（6）哪些是结点e的孩子？\n（7）哪些是结点e的兄弟？哪些是结点f的兄弟？\n（8）结点b和n的层次号分别是什么？\n（9）树的深度是多少？\n（10）以结点c为根的子树深度是多少？",
+    "options": {},
+    "answer": "根据给定的边确定的树如图所示：\n其中根结点是a；叶子节点有：d、m、n、j、k、f、l；c是结点g的双亲；a、c是结点g的祖先；j、k是结点g的孩子；m、n是结点e的子孙；e是结点d的兄弟；g、h是结点f的兄弟；结点b和n的层次号分别是2和5；树的深度为5。",
+    "source": "questions.docx#Q199",
+    "explanation": ""
+  },
+  {
+    "id": 200,
+    "q_type": "short",
+    "question": "回答一下问题：\n（1）．如果G1是一个具有n个顶点的连通无向图，那么G1最多有多少条边？G1最少有多少条边？\n（2）．如果G2是一个具有n个顶点的强连通有向图，那么G2最多有多少条边？G2最少有多少条边？\n（3）．如果G3是一个具有n个顶点的弱连通有向图，那么G3最多有多少条边？G3最少有多少条边？",
+    "options": {},
+    "answer": "（1）G1最多n(n-1)/2条边，最少n-1条边\n(2) G2最多n(n-1)条边，最少n条边\n(3) G3最多n(n-1)条边，最少n-1条边 (注：弱连通有向图指把有向图看作无向图时，仍是连通的)",
+    "source": "questions.docx#Q200",
+    "explanation": ""
+  },
+  {
+    "id": 201,
+    "q_type": "blank",
+    "question": "已知一个图的顶点集V和边集E分别为:\nV={1,2,3,4,5,6,7};\nE={<2,1>,<3,2>,<3,6>,<4,3>,<4,5>,<4,6>,<5,1>,<5,7>,<6,1>,<6,2>,<6,5>};\n若存储它采用邻接表,并且每个顶点邻接表中的边结点都是按照终点序号从小到大的次序链接的,按主教材中介绍的拓朴排序算法进行排序,试给出得到的拓朴排序的序列。",
+    "options": {},
+    "answer": "4 3 6 5 7 2 1",
+    "source": "questions.docx#Q201",
+    "explanation": ""
+  },
+  {
+    "id": 202,
+    "q_type": "short",
+    "question": "首先将如下图所示的无向图给出其存储结构的邻接链表表示,然后写出对其分别进行深度,广度优先遍历的结果。",
+    "options": {},
+    "answer": "深度优先遍历序列:125967384\n宽度优先遍历序列:123456789",
+    "source": "questions.docx#Q202",
+    "explanation": ""
+  },
+  {
+    "id": 203,
+    "q_type": "blank",
+    "question": "图中所示为一个有向网图及其带权邻接矩阵,要求对有向图采用Dijkstra算法,求从V0到其余各顶点的最短路径。\n较难,最短路径,02707008\n(a)有向带权图                                        (b)带权邻接矩阵",
+    "options": {},
+    "answer": "求解过程如下表所示:",
+    "source": "questions.docx#Q203",
+    "explanation": ""
+  },
+  {
+    "id": 204,
+    "q_type": "blank",
+    "question": "下图中给出了一个具有15个活动,11个时间的工程的A0E网,求其关键路径。",
+    "options": {},
+    "answer": "关键路径如图所示。",
+    "source": "questions.docx#Q204",
+    "explanation": ""
+  },
+  {
+    "id": 205,
+    "q_type": "blank",
+    "question": "记录的关键字序列为：63,90,70,55,67,42，则画出构造一棵二叉排序树的过程。",
+    "options": {},
+    "answer": "构造二叉排序树的过程如图所示。",
+    "source": "questions.docx#Q205",
+    "explanation": ""
+  },
+  {
+    "id": 206,
+    "q_type": "blank",
+    "question": "设一组初始记录关键字序列为(15,17,18,22,35,51,60),成功查找时的平均查找长度\n提示:答案采用分数形式,或保留小数点后2位。如:14/6 或 2.33",
+    "options": {},
+    "answer": "17/7; 2.43\n;",
+    "source": "questions.docx#Q206",
+    "explanation": ""
+  },
+  {
+    "id": 207,
+    "q_type": "short",
+    "question": "输入一个正整数序列(53,17,12,66,58,70,87,25,56,60)，试完成下列各题。\n（1）按次序构造一棵二叉排序树BS。\n（2）依此二叉排序树，如何得到一个从大到小的有序序列？\n（3）假定每个元素的查找概率相等，试计算该二叉排序树的平均查找长度。\n（4）画出在此二叉排序树中删除“66”后的树结构。",
+    "options": {},
+    "answer": "（1）构造的二叉排序树如图所示：\n（2）对于一个二叉排序树，想得到一个从大到小的序列，只要先读右子树，再读根结点，最后读左子树，按照此种遍历方式遍历二叉树即可。（如果是要从小到大的序列，则只需中序遍历这棵二叉树即可。）\n（3）该二叉树的平均查找长度为：\nASL=(1*1+2*2+3*4+4*3)/10=2.9\n（4）删除结点66后的二叉排序树如图所示：",
+    "source": "questions.docx#Q207",
+    "explanation": ""
+  },
+  {
+    "id": 208,
+    "q_type": "short",
+    "question": "设关键字序列 是堆,设计算法将关键字序列 调整为堆。",
+    "options": {},
+    "answer": "void adjustheap(int r[ ],int n)\n{\nint j=n,i=j/2,temp=r[j-1];\nwhile (i>=1)\nif (temp>=r[i-1])break;\nelse{\nr[j-1]=r[i-1];\nj=i;\ni=i/2;\n}\nr[j-1]=temp;\n}",
+    "source": "questions.docx#Q208",
+    "explanation": ""
+  },
+  {
+    "id": 209,
+    "q_type": "short",
+    "question": "已知一组记录为(46,74,53,14,26,38,86,65,27,34)，给出采用堆排序法进行排序时每一趟的排序结果。",
+    "options": {},
+    "answer": "建堆过程如下：\n0 46 74 53 14 26 38 86 65 27 34\n1 46 74 53 14 26 38 86 65 27 34\n2 46 74 53 14 26 38 86 65 27 34\n3 46 74 38 14 26 53 86 65 27 34\n4 46 14 38 27 26 53 86 65 74 34\n5 14 26 38 27 34 53 86 65 74 46\n进行堆排序的过程：\n0 14 26 38 27 34 53 86 65 74 46\n1 26 27 38 46 34 53 86 65 74 14\n2 27 34 38 46 74 53 86 65 26 14\n3 34 46 38 65 74 53 86 27 26 14\n4 38 46 53 65 74 86 34 27 26 14\n5 46 65 53 86 74 38 34 27 26 14\n6 53 65 74 86 46 38 34 27 26 14\n7 65 86 74 53 46 38 34 27 26 14\n8 74 86 65 53 46 38 34 27 26 14\n9 86 74 65 53 46 38 34 27 26 14",
+    "source": "questions.docx#Q209",
+    "explanation": ""
+  },
+  {
+    "id": 210,
+    "q_type": "short",
+    "question": "已知一组记录为(46,74,53,14,26,38,86,65,27,34)，给出采用归并排序法进行排序时每一趟的排序结果。",
+    "options": {},
+    "answer": "(0) [46][74][53][14][26][38][86][65][27][34]\n(1) [46  74][14  53][26  38][65  86][27  34]\n(2) [14  46  53  74][26  38  65  86][27  34]\n(3) [14  26  38  46  53  65  74  86][27  34]\n(4) [14  26  27  34  38  46  53  65  74  86]",
+    "source": "questions.docx#Q210",
+    "explanation": ""
+  }
+]

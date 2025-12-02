@@ -1,0 +1,12 @@
+{
+  "total_answered": 43,
+  "total_correct": 1,
+  "per_type_answered": {
+    "single": 4,
+    "blank": 39
+  },
+  "per_type_correct": {
+    "single": 1,
+    "blank": 0
+  }
+}
