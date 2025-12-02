@@ -18,6 +18,8 @@ import sys
 import random
 from typing import List, Dict, Optional, Set
 
+import html
+
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -41,8 +43,9 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
     QHeaderView,
     QMessageBox,
+    QAbstractItemView,
 )
-from PySide6.QtCore import QEasingCurve, QEvent, Qt, QPropertyAnimation
+from PySide6.QtCore import QEasingCurve, QEvent, Qt, QParallelAnimationGroup, QPropertyAnimation
 from PySide6.QtGui import QFont
 
 import config
@@ -119,8 +122,11 @@ class QuestionOverviewDialog(QDialog):
         self.table = QTableWidget(len(self.questions), 4, self)
         self.table.setHorizontalHeaderLabels(["题号", "题型", "题干预览", "收藏"])
         self.table.verticalHeader().setVisible(False)
+        self.table.verticalHeader().setDefaultSectionSize(32)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setAlternatingRowColors(True)
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
@@ -129,11 +135,15 @@ class QuestionOverviewDialog(QDialog):
         layout.addWidget(self.table)
 
         # 选中题目的预览区，增加交互感
+        preview_group = QGroupBox("完整题目 / 参考答案")
+        preview_layout = QVBoxLayout(preview_group)
         self.preview = QTextEdit(self)
         self.preview.setReadOnly(True)
-        self.preview.setMinimumHeight(140)
+        self.preview.setMinimumHeight(160)
         self.preview.setPlaceholderText("点击表格中的题目行，可以在这里预览题干和答案。")
-        layout.addWidget(self.preview)
+        self.preview.setFont(QFont("Microsoft YaHei", 12))
+        preview_layout.addWidget(self.preview)
+        layout.addWidget(preview_group)
 
         self._init_preview_animation()
         self.table.itemSelectionChanged.connect(self._on_selection_changed)
@@ -155,16 +165,35 @@ class QuestionOverviewDialog(QDialog):
             gridline-color: #d1d5db;
             font-size: 13px;
         }
+        QTableWidget::item:selected {
+            background-color: #e0f2fe;
+            color: #0f172a;
+        }
+        QTableWidget::item:hover {
+            background-color: #f5f8ff;
+        }
         QHeaderView::section {
             background-color: #e5edff;
             color: #111827;
             font-weight: 600;
+        }
+        QGroupBox {
+            border: 1px solid #d0d7e2;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            left: 10px;
+            padding: 0 4px;
         }
         QTextEdit#overviewPreview {
             background-color: #ffffff;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             padding: 8px;
+            font-size: 14px;
         }
         QPushButton {
             padding: 4px 10px;
@@ -226,22 +255,32 @@ class QuestionOverviewDialog(QDialog):
             return
 
         q = self.questions[row]
-        lines = [
-            f"题号：{q.id}",
-            f"题型：{qtype_label(q.q_type)}",
-            "",
-            q.question.strip(),
-        ]
-        if q.options:
-            lines.append("")
-            lines.append("选项：")
-            for label, text in sorted(q.options.items()):
-                lines.append(f"- {label}. {text}")
-        if q.answer:
-            lines.append("")
-            lines.append(f"参考答案：{q.answer.strip()}")
+        title = f"<b>题号：</b>{q.id}    <b>题型：</b>{qtype_label(q.q_type)}"
+        body = html.escape(q.question.strip()).replace("\n", "<br>")
 
-        self.preview.setPlainText("\n".join(lines))
+        option_lines = []
+        if q.options:
+            for label, text in sorted(q.options.items()):
+                opt_text = html.escape(text)
+                option_lines.append(f"<li><b>{label}.</b> {opt_text}</li>")
+        options_html = "".join(option_lines)
+
+        answer_html = ""
+        if q.answer:
+            answer_html = (
+                f"<div style='margin-top:8px'><b>参考答案：</b>{html.escape(q.answer.strip())}</div>"
+            )
+
+        html_text = "".join(
+            [
+                f"<div style='font-size:15px'>{title}</div>",
+                f"<div style='margin-top:6px; font-size:16px; line-height:1.6'>{body}</div>",
+                "<ul style='margin-top:8px; padding-left:16px'>" + options_html + "</ul>" if options_html else "",
+                answer_html,
+            ]
+        )
+
+        self.preview.setHtml(html_text)
         self._animate_preview()
 
     def _toggle_favorite(self, qid: int, btn: QPushButton):
@@ -318,6 +357,9 @@ class QuizWindow(QMainWindow):
         self.feedback_anim: Optional[QPropertyAnimation] = None
         self.question_effect: Optional[QGraphicsOpacityEffect] = None
         self.question_anim: Optional[QPropertyAnimation] = None
+        self.options_effect: Optional[QGraphicsOpacityEffect] = None
+        self.options_anim: Optional[QPropertyAnimation] = None
+        self.question_anim_group: Optional[QParallelAnimationGroup] = None
 
         self._hover_anims: Dict[QPushButton, QPropertyAnimation] = {}
 
@@ -526,7 +568,8 @@ class QuizWindow(QMainWindow):
         self.label_stat_rate = QLabel("总体正确率：0.00%")
         for w in (self.label_stat_total, self.label_stat_correct, self.label_stat_rate):
             stats_layout.addWidget(w)
-        self.btn_refresh_stats = QPushButton("刷新统计")
+        self.btn_refresh_stats = QPushButton("刷新 / 重置统计")
+        self.btn_refresh_stats.setObjectName("refreshStatsBtn")
         stats_layout.addWidget(self.btn_refresh_stats)
         right_panel.addWidget(stats_group)
 
@@ -615,10 +658,10 @@ class QuizWindow(QMainWindow):
         }
 
         QLabel {
-            font-size: 13px;
+            font-size: 14px;
         }
         #answerSummary {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
         }
 
@@ -628,12 +671,12 @@ class QuizWindow(QMainWindow):
             border: 1px solid #d0d7e2;
             border-radius: 4px;
             padding: 2px 4px;
-            font-size: 13px;
+            font-size: 14px;
         }
         QComboBox QAbstractItemView {
             background-color: #ffffff;
             color: #111827;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         QPushButton {
@@ -661,6 +704,17 @@ class QuizWindow(QMainWindow):
         }
         QPushButton#primaryButton:hover {
             background-color: #2563eb;
+        }
+        QPushButton#refreshStatsBtn {
+            background-color: #0ea5e9;
+            color: #f8fafc;
+            border-color: #0284c7;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        QPushButton#refreshStatsBtn:hover {
+            background-color: #0284c7;
+            border-color: #0369a1;
         }
 
         QTextEdit, QPlainTextEdit {
@@ -783,16 +837,32 @@ class QuizWindow(QMainWindow):
         self.question_effect = QGraphicsOpacityEffect(self.question_edit)
         self.question_edit.setGraphicsEffect(self.question_effect)
         self.question_anim = QPropertyAnimation(self.question_effect, b"opacity")
-        self.question_anim.setDuration(220)
+        self.question_anim.setDuration(260)
         self.question_anim.setStartValue(0.0)
         self.question_anim.setEndValue(1.0)
+        self.question_anim.setEasingCurve(QEasingCurve.InOutCubic)
+
+        self.options_effect = QGraphicsOpacityEffect(self.options_box)
+        self.options_box.setGraphicsEffect(self.options_effect)
+        self.options_anim = QPropertyAnimation(self.options_effect, b"opacity")
+        self.options_anim.setDuration(260)
+        self.options_anim.setStartValue(0.0)
+        self.options_anim.setEndValue(1.0)
+        self.options_anim.setEasingCurve(QEasingCurve.InOutCubic)
+
+        self.question_anim_group = QParallelAnimationGroup(self)
+        self.question_anim_group.addAnimation(self.question_anim)
+        self.question_anim_group.addAnimation(self.options_anim)
 
     def animate_question(self):
-        if not self.question_anim or not self.question_effect:
+        if not self.question_anim_group or not self.question_anim:
             return
-        self.question_anim.stop()
-        self.question_effect.setOpacity(0.0)
-        self.question_anim.start()
+        self.question_anim_group.stop()
+        if self.question_effect:
+            self.question_effect.setOpacity(0.0)
+        if self.options_effect:
+            self.options_effect.setOpacity(0.0)
+        self.question_anim_group.start()
 
     def _init_stats_animation(self, stats_group: QGroupBox):
         self.stats_effect = QGraphicsOpacityEffect(stats_group)
