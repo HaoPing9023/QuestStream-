@@ -146,13 +146,13 @@ class QuestionOverviewDialog(QDialog):
         layout.addWidget(preview_group)
 
         self._init_preview_animation()
-        self.table.itemSelectionChanged.connect(self._on_selection_changed)
+        self.table.clicked.connect(self._on_row_clicked)
 
         self._populate_table()
 
         if self.questions:
             self.table.selectRow(0)
-            self._on_selection_changed()
+            self._on_row_clicked(self.table.model().index(0, 0))
 
         # 提升可读性的局部样式
         self.setStyleSheet("""
@@ -239,7 +239,7 @@ class QuestionOverviewDialog(QDialog):
 
             btn = QPushButton(self)
             self._update_fav_button_text(btn, q.id)
-            btn.clicked.connect(partial(self._toggle_favorite, q.id, btn))
+            btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
             self.table.setCellWidget(row, 3, btn)
 
     def _update_fav_button_text(self, btn: QPushButton, qid: int):
@@ -248,8 +248,9 @@ class QuestionOverviewDialog(QDialog):
         else:
             btn.setText("收藏")
 
-    def _on_selection_changed(self):
-        row = self.table.currentRow()
+    def _on_row_clicked(self, model_index):
+        # 保持只有明确点击行时才切换预览，避免鼠标悬停误切换。
+        row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
         if row < 0 or row >= len(self.questions):
             self.preview.clear()
             return
@@ -282,6 +283,13 @@ class QuestionOverviewDialog(QDialog):
 
         self.preview.setHtml(html_text)
         self._animate_preview()
+
+    def _on_fav_button_clicked(self, row: int, qid: int, btn: QPushButton):
+        # 点击收藏按钮时，主动保持当前选择行和预览与按钮所在行一致。
+        if 0 <= row < self.table.rowCount():
+            self.table.selectRow(row)
+            self._on_row_clicked(self.table.model().index(row, 0))
+        self._toggle_favorite(qid, btn)
 
     def _toggle_favorite(self, qid: int, btn: QPushButton):
         if qid in self.favorite_ids:
@@ -504,23 +512,25 @@ class QuizWindow(QMainWindow):
         self.question_edit.setReadOnly(True)
         self.question_edit.setAcceptRichText(False)
         self.question_edit.setMinimumHeight(160)
+        self.question_edit.setFont(QFont("Microsoft YaHei", 17))
         q_layout.addWidget(self.question_edit)
         center_panel.addWidget(question_group, 3)
 
         options_group = QGroupBox("作答区域")
         options_layout_outer = QVBoxLayout(options_group)
-        options_layout_outer.setSpacing(4)
-        options_layout_outer.setContentsMargins(12, 8, 12, 8)
+        options_layout_outer.setSpacing(8)
+        options_layout_outer.setContentsMargins(12, 10, 12, 10)
 
         self.options_box = QGroupBox("选择一个选项")
         self.options_layout = QVBoxLayout(self.options_box)
-        self.options_layout.setSpacing(4)
+        self.options_layout.setSpacing(8)
         options_layout_outer.addWidget(self.options_box)
 
         self.short_answer_edit = QPlainTextEdit()
         self.short_answer_edit.setObjectName("shortAnswerEdit")
         self.short_answer_edit.setPlaceholderText("填空题 / 简答题：在这里输入你的答案。")
         self.short_answer_edit.setMinimumHeight(80)
+        self.short_answer_edit.setFont(QFont("Microsoft YaHei", 15))
         options_layout_outer.addWidget(self.short_answer_edit)
 
         button_frame = QFrame()
@@ -627,11 +637,12 @@ class QuizWindow(QMainWindow):
             font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
         }
         QMainWindow {
-            background-color: #f4f6fb;
+            background-color: #eef2f7;
         }
         #header {
             background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
                                        stop:0 #34495e, stop:1 #2c3e50);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
         }
         #header QLabel {
             color: #ecf0f1;
@@ -649,7 +660,8 @@ class QuizWindow(QMainWindow):
             border: 1px solid #d0d7e2;
             border-radius: 8px;
             margin-top: 10px;
-            font-size: 13px;
+            font-size: 13.5px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
         }
         QGroupBox::title {
             subcontrol-origin: margin;
@@ -658,10 +670,10 @@ class QuizWindow(QMainWindow):
         }
 
         QLabel {
-            font-size: 14px;
+            font-size: 15px;
         }
         #answerSummary {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
         }
 
@@ -684,14 +696,15 @@ class QuizWindow(QMainWindow):
             border-radius: 6px;
             border: 1px solid #d0d7e2;
             background-color: #ffffff;
-            font-size: 13px;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
         }
         QPushButton:hover {
             background-color: #eff4ff;
             border-color: #3b82f6;
         }
         QPushButton#navButton {
-            font-size: 14px;
+            font-size: 15px;
             padding: 6px 18px;
         }
         QPushButton#primaryButton {
@@ -699,7 +712,7 @@ class QuizWindow(QMainWindow):
             color: white;
             border-color: #3b82f6;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 15px;
             padding: 6px 18px;
         }
         QPushButton#primaryButton:hover {
@@ -721,32 +734,35 @@ class QuizWindow(QMainWindow):
             border-radius: 6px;
             border: 1px solid #d0d7e2;
             background-color: #ffffff;
-            font-size: 14px;
+            font-size: 15px;
         }
         #questionEdit {
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: 17px;
+            line-height: 1.7;
         }
         #shortAnswerEdit {
-            font-size: 14px;
+            font-size: 15px;
         }
         #feedbackEdit {
             background-color: #f9fbff;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         #progressFrame {
-            background-color: #e5edff;
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #e0ebff, stop:1 #f3f7ff);
             border-radius: 8px;
+            border: 1px solid #d0ddf0;
         }
 
         QRadioButton {
-            font-size: 15px;
-            padding: 4px 2px;
+            font-size: 16px;
+            padding: 6px 4px;
+            font-weight: 500;
         }
         QRadioButton::indicator {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
         }
         QRadioButton::indicator:checked {
             background-color: #3b82f6;
@@ -949,7 +965,8 @@ class QuizWindow(QMainWindow):
         self.label_stat_total.setText(f"总答题数：{total_answered}")
         self.label_stat_correct.setText(f"总正确数：{total_correct}")
         self.label_stat_rate.setText(f"总体正确率：{rate}")
-        self.animate_stats()
+        if self.stats_effect:
+            self.stats_effect.setOpacity(1.0)
 
     def refresh_global_stats(self):
         stats = load_stats()
@@ -959,6 +976,20 @@ class QuizWindow(QMainWindow):
         correct = sum(1 for s in self.index_status if s == "correct")
         wrong = sum(1 for s in self.index_status if s == "wrong")
         self.answer_summary_label.setText(f"做对 {correct} · 做错 {wrong}")
+
+    def _cache_current_answer(self):
+        """在跳题前缓存当前题目的作答，确保返回时可恢复。"""
+        if not self.current_questions:
+            return
+        if self.current_index < 0 or self.current_index >= len(self.user_answers):
+            return
+
+        q = self.current_questions[self.current_index]
+        if q.q_type in (config.QTYPE_SINGLE, config.QTYPE_TF):
+            cached = self.current_option_value or ""
+        else:
+            cached = self.short_answer_edit.toPlainText().strip()
+        self.user_answers[self.current_index] = cached
 
     # ---------- 答题卡（下拉框版） ----------
 
@@ -1212,6 +1243,7 @@ class QuizWindow(QMainWindow):
 
         # 更新“总体统计”区域
         self._apply_stats_to_labels(stats)
+        self.animate_stats()
 
         # 右侧反馈区展示更详细的刷新结果
         total_answered = stats.get("total_answered", 0)
@@ -1341,7 +1373,7 @@ class QuizWindow(QMainWindow):
                 for label in sorted(q.options.keys()):
                     text = q.options.get(label, "")
                     btn = QRadioButton(f"{label}.  {text}")
-                    btn.setStyleSheet("font-size: 15px; padding: 4px;")
+                    btn.setStyleSheet("font-size: 16px; padding: 6px 4px; font-weight: 500;")
                     btn.toggled.connect(self._make_option_handler(label))
                     self.options_layout.addWidget(btn)
                     self.option_buttons.append(btn)
@@ -1351,6 +1383,7 @@ class QuizWindow(QMainWindow):
                     else ""
                 )
                 if saved:
+                    self.current_option_value = saved
                     for b in self.option_buttons:
                         if b.text().startswith(f"{saved}."):
                             b.setChecked(True)
@@ -1364,7 +1397,7 @@ class QuizWindow(QMainWindow):
             self.options_box.setTitle("选择“正确”或“错误”")
             for txt in texts:
                 btn = QRadioButton(txt)
-                btn.setStyleSheet("font-size: 15px; padding: 4px;")
+                btn.setStyleSheet("font-size: 16px; padding: 6px 4px; font-weight: 500;")
                 btn.toggled.connect(self._make_option_handler(txt))
                 self.options_layout.addWidget(btn)
                 self.option_buttons.append(btn)
@@ -1374,6 +1407,7 @@ class QuizWindow(QMainWindow):
                 else ""
             )
             if saved:
+                self.current_option_value = saved
                 for b in self.option_buttons:
                     if b.text() == saved:
                         b.setChecked(True)
@@ -1398,6 +1432,8 @@ class QuizWindow(QMainWindow):
         def handler(checked: bool):
             if checked:
                 self.current_option_value = value
+                if 0 <= self.current_index < len(self.user_answers):
+                    self.user_answers[self.current_index] = value
         return handler
 
     # ---------- 提交 / 上一题 / 下一题 ----------
@@ -1474,6 +1510,8 @@ class QuizWindow(QMainWindow):
         if not self.current_questions:
             return
 
+        self._cache_current_answer()
+
         next_index = self.current_index + 1
         if next_index >= len(self.current_questions):
             self._finish_session()
@@ -1504,6 +1542,8 @@ class QuizWindow(QMainWindow):
         if self.current_index <= 0:
             return
 
+        self._cache_current_answer()
+
         self.current_index -= 1
         self.current_question = self.current_questions[self.current_index]
         self._show_current_question()
@@ -1528,6 +1568,8 @@ class QuizWindow(QMainWindow):
             return
         if idx < 0 or idx >= len(self.current_questions):
             return
+
+        self._cache_current_answer()
 
         self.current_index = idx
         self.current_question = self.current_questions[self.current_index]
