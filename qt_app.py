@@ -167,8 +167,10 @@ class QuestionOverviewDialog(QDialog):
             font-size: 13px;
         }
         QTableWidget::item:selected {
-            background-color: #e0f2fe;
+            background-color: #bfdbfe;
             color: #0f172a;
+            font-weight: 600;
+            border: 1px solid #2563eb;
         }
         QTableWidget::item:hover {
             background-color: #f5f8ff;
@@ -304,7 +306,7 @@ class QuestionOverviewDialog(QDialog):
 class QuizWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("本地刷题系统 - Qt 窗口版")
+        self.setWindowTitle("本地刷题系统")
         self.resize(1180, 720)
         self.setMinimumSize(1000, 650)
 
@@ -318,6 +320,7 @@ class QuizWindow(QMainWindow):
         self.per_type_total: Dict[str, int] = {}
         self.per_type_correct: Dict[str, int] = {}
         self.wrong_in_session: Dict[int, Question] = {}
+        self.wrong_book_map: Dict[int, Question] = {}
 
         self.index_status: List[str] = []
         self.user_answers: List[str] = []
@@ -379,6 +382,7 @@ class QuizWindow(QMainWindow):
         self._apply_style()
         self._init_feedback_animation()
         self._init_question_animation()
+        self._refresh_wrong_book_cache()
         self.refresh_global_stats()
 
     # ---------- UI ----------
@@ -397,7 +401,7 @@ class QuizWindow(QMainWindow):
         header_layout = QVBoxLayout(header)
         header_layout.setContentsMargins(20, 10, 20, 10)
 
-        title_label = QLabel("本地刷题系统 · Qt 窗口版")
+        title_label = QLabel("本地刷题系统")
         title_label.setObjectName("headerTitle")
         subtitle_label = QLabel("题库解析 · 随机刷题 · 错题本 · 做题统计 · 收藏题目")
         subtitle_label.setObjectName("headerSubtitle")
@@ -424,11 +428,13 @@ class QuizWindow(QMainWindow):
         self.btn_overview_bank = QPushButton("题库总览 / 收藏题目")
         self.btn_favorite_current = QPushButton("收藏当前题目")
         self.btn_view_favorites = QPushButton("查看收藏夹")
+        self.btn_remove_wrong = QPushButton("移出错题本")
         bank_layout.addWidget(self.btn_import_bank)
         bank_layout.addWidget(self.btn_delete_bank)
         bank_layout.addWidget(self.btn_overview_bank)
         bank_layout.addWidget(self.btn_favorite_current)
         bank_layout.addWidget(self.btn_view_favorites)
+        bank_layout.addWidget(self.btn_remove_wrong)
         left_panel.addWidget(bank_group)
 
         # 答题卡
@@ -615,6 +621,7 @@ class QuizWindow(QMainWindow):
         self.btn_overview_bank.clicked.connect(self.on_overview_bank)
         self.btn_favorite_current.clicked.connect(self.on_favorite_current_question)
         self.btn_view_favorites.clicked.connect(self.on_view_favorites)
+        self.btn_remove_wrong.clicked.connect(self.on_remove_from_wrong_book)
 
         self.btn_start_normal.clicked.connect(self.on_start_normal)
         self.btn_start_wrong.clicked.connect(self.on_start_wrong)
@@ -637,6 +644,7 @@ class QuizWindow(QMainWindow):
         self._clear_answer_card()
         self.btn_submit.setEnabled(False)
         self._refresh_favorite_star()
+        self._refresh_remove_wrong_button()
         self._init_hover_animations()
         self._init_stats_animation(stats_group)
 
@@ -971,6 +979,22 @@ class QuizWindow(QMainWindow):
         self.btn_star_favorite.setEnabled(True)
         self._set_star_style(self.current_question.id in self.favorite_ids)
 
+    def _refresh_remove_wrong_button(self):
+        if not hasattr(self, "btn_remove_wrong"):
+            return
+        if not self.current_question:
+            self.btn_remove_wrong.setEnabled(False)
+            self.btn_remove_wrong.setText("移出错题本")
+            return
+
+        count = self._get_wrong_count(self.current_question)
+        in_book = self.current_question.id in self.wrong_book_map
+        self.btn_remove_wrong.setEnabled(in_book)
+        if in_book and count > 0:
+            self.btn_remove_wrong.setText(f"移出错题本（错 {count} 次）")
+        else:
+            self.btn_remove_wrong.setText("移出错题本")
+
     def _set_star_style(self, is_fav: bool):
         base_style = (
             "font-weight: 700; padding: 6px 16px; border-radius: 18px;"
@@ -1051,17 +1075,35 @@ class QuizWindow(QMainWindow):
             detail.setObjectName("statDetailLine")
             self.stats_detail_container.addWidget(detail)
 
+    def _refresh_wrong_book_cache(self):
+        self.wrong_book_map = {q.id: q for q in load_wrong_questions()}
+
+    def _get_wrong_count(self, question: Question) -> int:
+        if not question:
+            return 0
+        cached = self.wrong_book_map.get(question.id)
+        if cached:
+            return getattr(cached, "wrong_count", 0)
+        return getattr(question, "wrong_count", 0)
+
     def _save_wrong_question_immediately(self, question: Question):
         existing = load_wrong_questions()
         by_id = {q.id: q for q in existing}
+        prev = by_id.get(question.id)
+        prev_count = getattr(prev, "wrong_count", 0) if prev else 0
+        question.wrong_count = prev_count + 1
         by_id[question.id] = question
         save_wrong_questions(list(by_id.values()))
+        self.wrong_book_map = by_id
 
-    def _remove_correct_from_wrong_book(self, question_id: int):
+    def _remove_from_wrong_book(self, question_id: int) -> bool:
         wrong_all = load_wrong_questions()
         new_list = [q for q in wrong_all if q.id != question_id]
         if len(new_list) != len(wrong_all):
             save_wrong_questions(new_list)
+            self._refresh_wrong_book_cache()
+            return True
+        return False
 
     def _update_answer_summary(self):
         correct = sum(1 for s in self.index_status if s == "correct")
@@ -1231,6 +1273,8 @@ class QuizWindow(QMainWindow):
         self.refresh_global_stats()
         self.animate_feedback()
         self._refresh_favorite_star()
+        self._refresh_wrong_book_cache()
+        self._refresh_remove_wrong_button()
 
     def on_overview_bank(self):
         qs = load_questions_from_file()
@@ -1308,6 +1352,31 @@ class QuizWindow(QMainWindow):
         dlg.setWindowTitle("收藏夹 · 已收藏的题目")
         dlg.exec()
         self.set_status("收藏夹窗口已关闭，可以继续刷题。")
+
+    def on_remove_from_wrong_book(self):
+        q = self.current_question
+        if not q:
+            self.set_status("当前没有题目可移除。")
+            self.set_feedback_text("需要先开始刷题或在错题本中跳转到某题。")
+            self.animate_feedback()
+            return
+
+        removed = self._remove_from_wrong_book(q.id)
+        if removed:
+            q.wrong_count = 0
+            self.set_status(f"已将题号 {q.id} 移出错题本。")
+            self.set_feedback_text("该题已不再计入错题本。")
+        else:
+            self.set_status("该题当前不在错题本中。")
+            self.set_feedback_text("只有存在于错题本的题目才可以移除。")
+        self.animate_feedback()
+        if self.current_question:
+            total = len(self.current_questions)
+            idx = self.current_index + 1
+            self.set_progress(
+                f"第 {idx} / {total} 题  [{qtype_label(q.q_type)}]  (题号: {q.id})"
+            )
+        self._refresh_remove_wrong_button()
 
     def on_refresh_stats(self):
         reply_reset = self._ask_refresh_stats()
@@ -1477,7 +1546,12 @@ class QuizWindow(QMainWindow):
 
     def _begin_quiz(self, questions: List[Question], mode: str):
         self.mode = mode
+        self._refresh_wrong_book_cache()
         self.current_questions = list(questions)
+        for q in self.current_questions:
+            cached = self.wrong_book_map.get(q.id)
+            if cached:
+                q.wrong_count = getattr(cached, "wrong_count", 0)
         random.shuffle(self.current_questions)
         self.current_index = 0 if self.current_questions else -1
         self.current_question = (
@@ -1511,6 +1585,7 @@ class QuizWindow(QMainWindow):
             self.btn_submit.setText("提交答案")
             self.btn_submit.setEnabled(False)
             self._refresh_favorite_star()
+            self._refresh_remove_wrong_button()
             self._refresh_answer_card()
             return
 
@@ -1518,7 +1593,11 @@ class QuizWindow(QMainWindow):
         total = len(self.current_questions)
         idx = self.current_index + 1
 
-        self.set_progress(f"第 {idx} / {total} 题  [{qtype_label(q.q_type)}]  (题号: {q.id})")
+        wrong_count = self._get_wrong_count(q)
+        extra = f" · 错题次数：{wrong_count}" if wrong_count > 0 else ""
+        self.set_progress(
+            f"第 {idx} / {total} 题  [{qtype_label(q.q_type)}]  (题号: {q.id}){extra}"
+        )
         self.set_question_text(q.question.strip())
 
         self.clear_options()
@@ -1585,6 +1664,7 @@ class QuizWindow(QMainWindow):
         self._update_answer_summary()
         self._refresh_answer_card()
         self._refresh_favorite_star()
+        self._refresh_remove_wrong_button()
 
     def _make_option_handler(self, value: str):
         def handler(checked: bool):
@@ -1657,8 +1737,6 @@ class QuizWindow(QMainWindow):
         per_total_once = {t: 1}
         per_correct_once = {t: 1 if is_correct else 0}
         _update_stats(per_total_once, per_correct_once)
-        if is_correct:
-            self._remove_correct_from_wrong_book(q.id)
         self.refresh_global_stats()
 
         self._refresh_answer_card()
@@ -1789,31 +1867,16 @@ class QuizWindow(QMainWindow):
         total_questions = len(self.current_questions)
         unanswered = max(total_questions - answered, 0)
 
-        if self.mode == "normal":
-            if self.wrong_in_session:
-                existing = load_wrong_questions()
-                by_id = {q.id: q for q in existing}
-                for q in self.wrong_in_session.values():
-                    by_id[q.id] = q
-                new_list = list(by_id.values())
-                save_wrong_questions(new_list)
-                wrong_msg = f"本轮新增错题 {len(self.wrong_in_session)} 道，错题本总数：{len(new_list)}。"
-            else:
-                wrong_msg = "本轮没有新增错题，错题本保持不变。"
-        elif self.mode == "wrong":
-            wrong_ids = set(self.wrong_in_session.keys())
-            origin_ids = set(q.id for q in self.current_questions)
-            correct_ids = origin_ids - wrong_ids
-
-            wrong_all = load_wrong_questions()
-            by_id = {q.id: q for q in wrong_all}
-            for qid in correct_ids:
-                by_id.pop(qid, None)
+        if self.mode in {"normal", "wrong"}:
+            existing = load_wrong_questions()
+            by_id = {q.id: q for q in existing}
             for q in self.wrong_in_session.values():
+                prev = by_id.get(q.id)
+                prev_count = getattr(prev, "wrong_count", 0) if prev else 0
+                q.wrong_count = max(prev_count, getattr(q, "wrong_count", 0))
                 by_id[q.id] = q
-            new_list = list(by_id.values())
-            save_wrong_questions(new_list)
-            wrong_msg = f"本轮练习结束后，错题本剩余 {len(new_list)} 道题。"
+            save_wrong_questions(list(by_id.values()))
+            wrong_msg = f"本轮记录错题 {len(self.wrong_in_session)} 次，错题本总数：{len(by_id)}。"
         else:
             wrong_msg = ""
 
@@ -1837,6 +1900,13 @@ class QuizWindow(QMainWindow):
         self.set_question_text("本轮结果已在右侧显示，你可以看一眼整体情况。")
         self.animate_feedback()
 
+        self.clear_options()
+        self.show_short_answer(False)
+        self.short_answer_edit.clear()
+        self.options_box.setTitle("作答区域")
+
+        self._refresh_wrong_book_cache()
+
         self.mode = None
         self.current_questions = []
         self.current_index = -1
@@ -1849,6 +1919,7 @@ class QuizWindow(QMainWindow):
         self.refresh_global_stats()
         self._refresh_answer_card()
         self._refresh_favorite_star()
+        self._refresh_remove_wrong_button()
 
 
 def main():
