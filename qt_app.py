@@ -219,7 +219,7 @@ class QuestionOverviewDialog(QDialog):
         self.table = QTableWidget(len(self.questions), 4, self)
         self.table.setHorizontalHeaderLabels(["题号", "题型", "题干预览", "收藏"])
         self.table.verticalHeader().setVisible(False)
-        self.table.verticalHeader().setDefaultSectionSize(32)
+        self.table.verticalHeader().setDefaultSectionSize(38)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -238,7 +238,7 @@ class QuestionOverviewDialog(QDialog):
         preview_layout = QVBoxLayout(preview_group)
         self.preview = QTextEdit(self)
         self.preview.setReadOnly(True)
-        self.preview.setMinimumHeight(230)
+        self.preview.setMinimumHeight(320)
         self.preview.setPlaceholderText("点击表格中的题目行，可以在这里预览题干和答案。")
         self.preview.setFont(QFont("Microsoft YaHei", 12))
         self.preview.setLineWrapMode(QTextEdit.WidgetWidth)
@@ -315,13 +315,14 @@ class QuestionOverviewDialog(QDialog):
             line-height: 1.6;
         }
         QPushButton {
-            padding: 6px 14px;
+            padding: 4px 10px;
             border-radius: 6px;
             border: 1px solid #c7d2fe;
             background-color: #e0e7ff;
             color: #0f172a;
             font-weight: 600;
             min-width: 96px;
+            min-height: 30px;
         }
         QPushButton:hover {
             background-color: #c7d2fe;
@@ -375,6 +376,7 @@ class QuestionOverviewDialog(QDialog):
 
             btn = QPushButton(self)
             btn.setFocusPolicy(Qt.NoFocus)
+            btn.setMinimumHeight(30)
             self._update_fav_button_text(btn, q.id)
             btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
             self.table.setCellWidget(row, 3, btn)
@@ -461,7 +463,7 @@ class WrongOverviewDialog(QDialog):
         self.table = QTableWidget(len(self.questions), 5, self)
         self.table.setHorizontalHeaderLabels(["题号", "题型", "题干预览", "错题次数", "操作"])
         self.table.verticalHeader().setVisible(False)
-        self.table.verticalHeader().setDefaultSectionSize(32)
+        self.table.verticalHeader().setDefaultSectionSize(38)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -479,7 +481,7 @@ class WrongOverviewDialog(QDialog):
         preview_layout = QVBoxLayout(preview_group)
         self.preview = QTextEdit(self)
         self.preview.setReadOnly(True)
-        self.preview.setMinimumHeight(230)
+        self.preview.setMinimumHeight(320)
         self.preview.setPlaceholderText("点击表格中的题目行，可以在这里预览题干和答案。")
         self.preview.setFont(QFont("Microsoft YaHei", 12))
         self.preview.setLineWrapMode(QTextEdit.WidgetWidth)
@@ -608,6 +610,7 @@ class WrongOverviewDialog(QDialog):
             btn = QPushButton("移出错题本", self)
             btn.setObjectName("removeWrongBtn")
             btn.setFocusPolicy(Qt.NoFocus)
+            btn.setMinimumHeight(30)
             btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
             self.table.setCellWidget(row, 4, btn)
 
