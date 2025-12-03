@@ -315,14 +315,14 @@ class QuestionOverviewDialog(QDialog):
             line-height: 1.6;
         }
         QPushButton {
-            padding: 3px 8px;
+            padding: 2px 6px;
             border-radius: 6px;
             border: 1px solid #c7d2fe;
             background-color: #e0e7ff;
             color: #0f172a;
             font-weight: 600;
-            min-width: 78px;
-            min-height: 26px;
+            min-width: 64px;
+            min-height: 22px;
         }
         QPushButton:hover {
             background-color: #c7d2fe;
@@ -555,12 +555,13 @@ class WrongOverviewDialog(QDialog):
             outline: none;
         }
         QPushButton#removeWrongBtn {
-            padding: 4px 12px;
+            padding: 2px 8px;
             border-radius: 5px;
             border: 1px solid #f87171;
             background-color: #fef2f2;
             color: #b91c1c;
             font-weight: 600;
+            min-height: 24px;
         }
         QPushButton#removeWrongBtn:hover {
             background-color: #fee2e2;
@@ -610,7 +611,6 @@ class WrongOverviewDialog(QDialog):
             btn = QPushButton("移出错题本", self)
             btn.setObjectName("removeWrongBtn")
             btn.setFocusPolicy(Qt.NoFocus)
-            btn.setMinimumHeight(30)
             btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
             self.table.setCellWidget(row, 4, btn)
 
