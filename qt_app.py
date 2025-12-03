@@ -302,6 +302,7 @@ class QuestionOverviewDialog(QDialog):
                                         stop: 0 #a855f7, stop: 0.6 #7c3aed, stop: 1 #4f46e5);
             color: #f8fafc;
             font-weight: 800;
+            font-size: 13px;
             letter-spacing: 0.5px;
             min-height: 34px;
         }
@@ -387,6 +388,8 @@ class QuestionOverviewDialog(QDialog):
     def _populate_table(self):
         from functools import partial
 
+        button_font = QFont("Microsoft YaHei", 10, QFont.DemiBold)
+
         for row, q in enumerate(self.questions):
             item_id = QTableWidgetItem(str(q.id))
             item_type = QTableWidgetItem(qtype_label(q.q_type))
@@ -402,6 +405,7 @@ class QuestionOverviewDialog(QDialog):
             btn = QPushButton(self)
             btn.setObjectName("favoriteBtn")
             btn.setFocusPolicy(Qt.NoFocus)
+            btn.setFont(button_font)
             btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             btn.setMinimumWidth(104)
             btn.setMinimumHeight(30)
@@ -421,9 +425,9 @@ class QuestionOverviewDialog(QDialog):
 
     def _update_fav_button_text(self, btn: QPushButton, qid: int):
         if qid in self.favorite_ids:
-            btn.setText("取消收藏")
+            btn.setText("★ 取消收藏")
         else:
-            btn.setText("收藏")
+            btn.setText("☆ 收藏")
 
     def _on_row_clicked(self, model_index):
         row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
@@ -598,7 +602,8 @@ class WrongOverviewDialog(QDialog):
             border: 1px solid #f87171;
             background-color: #fef2f2;
             color: #b91c1c;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 12px;
             min-height: 30px;
         }
         QPushButton#removeWrongBtn:hover {
@@ -631,6 +636,8 @@ class WrongOverviewDialog(QDialog):
     def _populate_table(self):
         from functools import partial
 
+        button_font = QFont("Microsoft YaHei", 10, QFont.DemiBold)
+
         for row, q in enumerate(self.questions):
             item_id = QTableWidgetItem(str(q.id))
             item_type = QTableWidgetItem(qtype_label(q.q_type))
@@ -646,9 +653,10 @@ class WrongOverviewDialog(QDialog):
             self.table.setItem(row, 2, item_q)
             self.table.setItem(row, 3, item_wrong)
 
-            btn = QPushButton("移出错题本", self)
+            btn = QPushButton("🗑 移出错题本", self)
             btn.setObjectName("removeWrongBtn")
             btn.setFocusPolicy(Qt.NoFocus)
+            btn.setFont(button_font)
             btn.setMinimumWidth(112)
             btn.setMinimumHeight(30)
             btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
