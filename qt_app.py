@@ -219,7 +219,8 @@ class QuestionOverviewDialog(QDialog):
         self.table = QTableWidget(len(self.questions), 4, self)
         self.table.setHorizontalHeaderLabels(["题号", "题型", "题干预览", "收藏"])
         self.table.verticalHeader().setVisible(False)
-        self.table.verticalHeader().setDefaultSectionSize(44)
+        # 留出足够行高，让收藏按钮垂直居中且不被裁切
+        self.table.verticalHeader().setDefaultSectionSize(52)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -295,16 +296,16 @@ class QuestionOverviewDialog(QDialog):
             font-weight: 600;
         }
         QPushButton#favoriteBtn {
-            padding: 6px 14px;
-            border-radius: 14px;
+            padding: 6px 16px;
+            border-radius: 16px;
             border: 2px solid #7c3aed;
             background-color: #ede9fe;
             color: #312e81;
             font-weight: 800;
             font-size: 13px;
             letter-spacing: 0.5px;
-            min-height: 30px;
-            min-width: 120px;
+            min-height: 34px;
+            min-width: 140px;
         }
         QPushButton#favoriteBtn:hover {
             background-color: #ddd6fe;
@@ -406,14 +407,14 @@ class QuestionOverviewDialog(QDialog):
             btn.setFocusPolicy(Qt.NoFocus)
             btn.setFont(button_font)
             btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            btn.setMinimumWidth(126)
-            btn.setMinimumHeight(30)
+            btn.setMinimumWidth(140)
+            btn.setMinimumHeight(34)
             self._update_fav_button_text(btn, q.id)
             btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
-            container_layout.setContentsMargins(4, 4, 4, 4)
+            container_layout.setContentsMargins(6, 6, 6, 6)
             container_layout.setSpacing(0)
             container_layout.setAlignment(Qt.AlignCenter)
             container_layout.addWidget(btn)
@@ -421,7 +422,7 @@ class QuestionOverviewDialog(QDialog):
             self.table.setCellWidget(row, 3, container)
 
         # 确保“收藏 / 取消收藏”按钮列足够展示完整文本且居中
-        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 148))
+        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 180))
 
     def _update_fav_button_text(self, btn: QPushButton, qid: int):
         if qid in self.favorite_ids:
