@@ -295,21 +295,26 @@ class QuestionOverviewDialog(QDialog):
             font-weight: 600;
         }
         QPushButton#favoriteBtn {
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid #a5b4fc;
-            background-color: #eef2ff;
-            color: #1d4ed8;
-            font-weight: 600;
-            min-height: 30px;
+            padding: 8px 16px;
+            border-radius: 14px;
+            border: 2px solid #7c3aed;
+            background: qlineargradient(x1 0, y1 0, x2 1, y2 1,
+                                        stop: 0 #a855f7, stop: 0.6 #7c3aed, stop: 1 #4f46e5);
+            color: #f8fafc;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            min-height: 34px;
         }
         QPushButton#favoriteBtn:hover {
-            background-color: #e0e7ff;
-            border-color: #93c5fd;
+            background: qlineargradient(x1 0, y1 0, x2 1, y2 0,
+                                        stop: 0 #c084fc, stop: 1 #6366f1);
+            border-color: #c084fc;
+            color: #ffffff;
         }
         QPushButton#favoriteBtn:pressed {
-            background-color: #c7d2fe;
-            border-color: #7c3aed;
+            background: #312e81;
+            border-color: #312e81;
+            color: #e0e7ff;
         }
         QPushButton#favoriteBtn:focus {
             outline: none;
