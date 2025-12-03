@@ -315,14 +315,14 @@ class QuestionOverviewDialog(QDialog):
             line-height: 1.6;
         }
         QPushButton {
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 6px;
             border: 1px solid #c7d2fe;
             background-color: #e0e7ff;
             color: #0f172a;
             font-weight: 600;
-            min-width: 96px;
-            min-height: 30px;
+            min-width: 78px;
+            min-height: 26px;
         }
         QPushButton:hover {
             background-color: #c7d2fe;
@@ -376,7 +376,7 @@ class QuestionOverviewDialog(QDialog):
 
             btn = QPushButton(self)
             btn.setFocusPolicy(Qt.NoFocus)
-            btn.setMinimumHeight(30)
+            btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             self._update_fav_button_text(btn, q.id)
             btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
             self.table.setCellWidget(row, 3, btn)
