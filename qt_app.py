@@ -231,6 +231,7 @@ class QuestionOverviewDialog(QDialog):
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setMinimumSectionSize(82)
 
         layout.addWidget(self.table)
 
@@ -413,7 +414,7 @@ class QuestionOverviewDialog(QDialog):
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
-            container_layout.setContentsMargins(6, 0, 6, 0)
+            container_layout.setContentsMargins(2, 0, 2, 0)
             container_layout.setSpacing(0)
             container_layout.setAlignment(Qt.AlignCenter)
             container_layout.addWidget(btn)
@@ -421,7 +422,9 @@ class QuestionOverviewDialog(QDialog):
             self.table.setCellWidget(row, 3, container)
 
         # 确保“收藏 / 取消收藏”按钮列足够展示完整文本且不显得过宽
-        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 138))
+        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 132))
+        # 让“题型”列有更宽的空间避免文字被省略
+        self.table.setColumnWidth(1, max(self.table.columnWidth(1), 92))
 
     def _update_fav_button_text(self, btn: QPushButton, qid: int):
         if qid in self.favorite_ids:
@@ -492,12 +495,12 @@ class WrongOverviewDialog(QDialog):
         self,
         parent: QMainWindow,
         questions: List[Question],
-        remove_callback: Callable[[int], bool],
+        toggle_callback: Callable[[Question], bool],
         app_icon: Optional[QIcon] = None,
     ):
         super().__init__(parent)
         self.questions = list(questions)
-        self.remove_callback = remove_callback
+        self.toggle_callback = toggle_callback
         self._current_row = -1
         self._selection_guard = False
         self.setWindowTitle("错题本总览")
@@ -525,6 +528,7 @@ class WrongOverviewDialog(QDialog):
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setMinimumSectionSize(82)
 
         layout.addWidget(self.table)
 
@@ -669,7 +673,8 @@ class WrongOverviewDialog(QDialog):
             btn.setFont(button_font)
             btn.setMinimumWidth(112)
             btn.setMinimumHeight(22)
-            btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
+            btn.clicked.connect(partial(self._on_toggle_clicked, q, btn))
+            self._update_button_text(btn, True)
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
@@ -682,6 +687,7 @@ class WrongOverviewDialog(QDialog):
 
         # 让“移出错题本”按钮列保持足够宽度并保持居中显示
         self.table.setColumnWidth(4, max(self.table.columnWidth(4), 132))
+        self.table.setColumnWidth(1, max(self.table.columnWidth(1), 92))
 
     def _on_row_clicked(self, model_index):
         row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
@@ -704,17 +710,31 @@ class WrongOverviewDialog(QDialog):
         self.preview.setHtml(build_preview_html(q, include_wrong=True))
         self._animate_preview()
 
-    def _on_remove_clicked(self, qid: int, btn: QPushButton):
-        if not self.remove_callback:
-            return
-        success = self.remove_callback(qid)
-        if not success:
+    def _on_toggle_clicked(self, question: Question, btn: QPushButton):
+        if not self.toggle_callback:
             return
 
-        btn.setEnabled(False)
-        btn.setText("已移出")
+        in_book = self.toggle_callback(question)
+        self._update_button_text(btn, in_book)
         self._animate_button_pulse(btn)
-        self._remove_row_by_id(qid)
+        self._sync_info_label(in_book)
+
+    def _update_button_text(self, btn: QPushButton, in_book: bool):
+        if in_book:
+            btn.setText("🗑 移出错题本")
+            btn.setStyleSheet("")
+        else:
+            btn.setText("↩ 加回错题本")
+            btn.setStyleSheet(
+                "background-color: #ecfdf3; border: 1px solid #bbf7d0;"
+                " color: #166534;"
+            )
+
+    def _sync_info_label(self, in_book: bool):
+        if in_book:
+            self.info_label.setText("提示：可查看错题次数，或点击右侧按钮直接移出错题本。")
+        else:
+            self.info_label.setText("提示：已移出，可再次点击“加回错题本”恢复。")
 
     def _on_selection_changed(self, *_):
         if self._selection_guard:
@@ -1114,9 +1134,14 @@ class QuizWindow(QMainWindow):
         QToolTip {
             background-color: #0b1221;
             color: #f8fafc;
-            border: 1px solid #000814;
-            border-radius: 8px;
+            border: 1px solid #0b1221;
+            border-radius: 10px;
             padding: 6px 10px;
+            box-shadow: none;
+        }
+        QToolTip QLabel {
+            background: transparent;
+            border: none;
         }
         #header {
             background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
@@ -1473,11 +1498,14 @@ class QuizWindow(QMainWindow):
 
         count = self._get_wrong_count(self.current_question)
         in_book = self.current_question.id in self.wrong_book_map
-        self.btn_remove_wrong.setEnabled(in_book)
-        if in_book and count > 0:
-            self.btn_remove_wrong.setText(f"移出错题本（错 {count} 次）")
+        self.btn_remove_wrong.setEnabled(True)
+        if in_book:
+            if count > 0:
+                self.btn_remove_wrong.setText(f"移出错题本（错 {count} 次）")
+            else:
+                self.btn_remove_wrong.setText("移出错题本")
         else:
-            self.btn_remove_wrong.setText("移出错题本")
+            self.btn_remove_wrong.setText("加回错题本")
 
     def _set_star_style(self, is_fav: bool):
         base_style = (
@@ -1580,14 +1608,21 @@ class QuizWindow(QMainWindow):
         save_wrong_questions(list(by_id.values()))
         self.wrong_book_map = by_id
 
-    def _remove_from_wrong_book(self, question_id: int) -> bool:
+    def _toggle_wrong_book_entry(self, question: Question) -> bool:
         wrong_all = load_wrong_questions()
-        new_list = [q for q in wrong_all if q.id != question_id]
-        if len(new_list) != len(wrong_all):
-            save_wrong_questions(new_list)
-            self._refresh_wrong_book_cache()
-            return True
-        return False
+        by_id = {q.id: q for q in wrong_all}
+
+        if question.id in by_id:
+            by_id.pop(question.id)
+            in_book = False
+        else:
+            question.wrong_count = max(self._get_wrong_count(question), 1)
+            by_id[question.id] = question
+            in_book = True
+
+        save_wrong_questions(list(by_id.values()))
+        self._refresh_wrong_book_cache()
+        return in_book
 
     def _update_answer_summary(self):
         correct = sum(1 for s in self.index_status if s == "correct")
@@ -1793,7 +1828,7 @@ class QuizWindow(QMainWindow):
             self.animate_feedback()
             return
 
-        dlg = WrongOverviewDialog(self, wrong_all, self._remove_from_wrong_book, self.app_icon)
+        dlg = WrongOverviewDialog(self, wrong_all, self._toggle_wrong_book_entry, self.app_icon)
         dlg.exec()
         self._refresh_wrong_book_cache()
         self._refresh_remove_wrong_button()
@@ -1855,14 +1890,18 @@ class QuizWindow(QMainWindow):
             self.animate_feedback()
             return
 
-        removed = self._remove_from_wrong_book(q.id)
-        if removed:
+        was_in_book = q.id in self.wrong_book_map
+        in_book = self._toggle_wrong_book_entry(q)
+        if was_in_book and not in_book:
             q.wrong_count = 0
             self.set_status(f"已将题号 {q.id} 移出错题本。")
             self.set_feedback_text("该题已不再计入错题本。")
+        elif not was_in_book and in_book:
+            self.set_status(f"已重新将题号 {q.id} 放回错题本。")
+            self.set_feedback_text("已恢复到错题本，可继续复习。")
         else:
-            self.set_status("该题当前不在错题本中。")
-            self.set_feedback_text("只有存在于错题本的题目才可以移除。")
+            self.set_status("错题本状态未变动。")
+            self.set_feedback_text("只有存在于错题本的题目才可以切换状态。")
         self.animate_feedback()
         if self.current_question:
             total = len(self.current_questions)
