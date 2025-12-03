@@ -272,8 +272,6 @@ class QuestionOverviewDialog(QDialog):
             background-color: #e0f2fe;
             color: #0f172a;
             font-weight: 700;
-            border: 1px solid #bfdbfe;
-            border-radius: 4px;
         }
         QTableWidget::item:focus {
             outline: none;
@@ -310,10 +308,11 @@ class QuestionOverviewDialog(QDialog):
             outline: none;
         }
         QPushButton {
-            padding: 4px 10px;
+            padding: 6px 12px;
             border-radius: 4px;
             border: 1px solid #cbd5e1;
             background-color: #ffffff;
+            min-width: 92px;
         }
         QPushButton:hover {
             background-color: #eff6ff;
@@ -1828,17 +1827,12 @@ class QuizWindow(QMainWindow):
         layout.setContentsMargins(20, 16, 20, 16)
         layout.setSpacing(12)
 
-        accent_bar = QFrame(dialog)
-        accent_bar.setObjectName("dialogAccent")
-        accent_bar.setFixedHeight(4)
-
         title = QLabel("刷新统计数据")
         title.setObjectName("dialogTitle")
         desc = QLabel("是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。")
         desc.setWordWrap(True)
         desc.setObjectName("dialogDesc")
 
-        layout.addWidget(accent_bar)
         layout.addWidget(title)
         layout.addWidget(desc)
 
@@ -1855,7 +1849,7 @@ class QuizWindow(QMainWindow):
             QDialog {
                 background-color: #f3f6fb;
                 border: 1px solid #cbd5e1;
-                border-radius: 12px;
+                border-radius: 8px;
             }
             #dialogTitle {
                 font-size: 16px;
@@ -1881,11 +1875,6 @@ class QuizWindow(QMainWindow):
             }
             QDialog QPushButton:pressed {
                 background-color: #0f172a;
-            }
-            QFrame#dialogAccent {
-                background-color: #1f2937;
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
             }
             """
         )
