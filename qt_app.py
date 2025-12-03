@@ -296,15 +296,16 @@ class QuestionOverviewDialog(QDialog):
             font-weight: 600;
         }
         QPushButton#favoriteBtn {
-            padding: 1px 6px;
-            border-radius: 8px;
+            padding: 2px 8px;
+            border-radius: 9px;
             border: 1px solid #cbd5e1;
             background-color: #f8fafc;
             color: #0f172a;
             font-weight: 700;
             font-size: 12px;
-            min-height: 20px;
-            min-width: 96px;
+            min-height: 22px;
+            min-width: 104px;
+            transition: all 120ms ease;
         }
         QPushButton#favoriteBtn:hover {
             background-color: #e2e8f0;
@@ -405,14 +406,14 @@ class QuestionOverviewDialog(QDialog):
             btn.setFocusPolicy(Qt.NoFocus)
             btn.setFont(button_font)
             btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            btn.setMinimumWidth(96)
-            btn.setMinimumHeight(20)
+            btn.setMinimumWidth(108)
+            btn.setMinimumHeight(22)
             self._update_fav_button_text(btn, q.id)
             btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
-            container_layout.setContentsMargins(0, 0, 0, 0)
+            container_layout.setContentsMargins(6, 0, 6, 0)
             container_layout.setSpacing(0)
             container_layout.setAlignment(Qt.AlignCenter)
             container_layout.addWidget(btn)
@@ -420,13 +421,22 @@ class QuestionOverviewDialog(QDialog):
             self.table.setCellWidget(row, 3, container)
 
         # 确保“收藏 / 取消收藏”按钮列足够展示完整文本且不显得过宽
-        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 120))
+        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 138))
 
     def _update_fav_button_text(self, btn: QPushButton, qid: int):
         if qid in self.favorite_ids:
             btn.setText("★ 取消收藏")
+            btn.setStyleSheet(
+                "background-color: #fff7d6; border: 1px solid #f4b740;"
+                " color: #92400e;"
+                " box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);"
+            )
         else:
             btn.setText("☆ 收藏")
+            btn.setStyleSheet(
+                "background-color: #f8fafc; border: 1px solid #cbd5e1;"
+                " color: #0f172a; box-shadow: none;"
+            )
 
     def _on_row_clicked(self, model_index):
         row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
@@ -657,13 +667,13 @@ class WrongOverviewDialog(QDialog):
             btn.setObjectName("removeWrongBtn")
             btn.setFocusPolicy(Qt.NoFocus)
             btn.setFont(button_font)
-            btn.setMinimumWidth(98)
-            btn.setMinimumHeight(20)
+            btn.setMinimumWidth(112)
+            btn.setMinimumHeight(22)
             btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
-            container_layout.setContentsMargins(0, 0, 0, 0)
+            container_layout.setContentsMargins(6, 0, 6, 0)
             container_layout.setSpacing(0)
             container_layout.setAlignment(Qt.AlignCenter)
             container_layout.addWidget(btn)
@@ -671,7 +681,7 @@ class WrongOverviewDialog(QDialog):
             self.table.setCellWidget(row, 4, container)
 
         # 让“移出错题本”按钮列保持足够宽度并保持居中显示
-        self.table.setColumnWidth(4, max(self.table.columnWidth(4), 110))
+        self.table.setColumnWidth(4, max(self.table.columnWidth(4), 132))
 
     def _on_row_clicked(self, model_index):
         row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
@@ -1100,6 +1110,13 @@ class QuizWindow(QMainWindow):
         }
         QMainWindow {
             background-color: #eef2f7;
+        }
+        QToolTip {
+            background-color: #0b1221;
+            color: #f8fafc;
+            border: 1px solid #000814;
+            border-radius: 8px;
+            padding: 6px 10px;
         }
         #header {
             background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
