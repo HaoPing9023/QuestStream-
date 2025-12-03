@@ -127,6 +127,69 @@ def save_favorite_ids(ids: Set[int]):
         json.dump(sorted(list(ids)), f, ensure_ascii=False, indent=2)
 
 
+def build_preview_html(q: Question, include_wrong: bool = False) -> str:
+    """将题目内容渲染为统一且易读的 HTML。"""
+
+    def _wrap_paragraphs(text: str) -> str:
+        lines = [html.escape(line.strip()) for line in text.splitlines() if line.strip()]
+        if not lines:
+            return ""
+        return "".join(f"<p style='margin:4px 0'>{line}</p>" for line in lines)
+
+    title_html = (
+        "<div style='font-size:15px; font-weight:700; color:#111827'>"
+        f"题号 {q.id} · {qtype_label(q.q_type)}"
+        "</div>"
+    )
+    body_html = _wrap_paragraphs(q.question.strip())
+
+    option_lines = []
+    if q.options:
+        for label, text in sorted(q.options.items()):
+            opt_text = html.escape(text)
+            option_lines.append(
+                f"<li style='margin:6px 0'><b style='margin-right:6px'>{label}.</b>{opt_text}</li>"
+            )
+    options_html = (
+        "<div style='margin-top:8px'><div style='color:#475569; font-weight:700; margin-bottom:4px'>选项</div>"
+        "<ul style='margin:0; padding-left:18px'>" + "".join(option_lines) + "</ul></div>"
+        if option_lines
+        else ""
+    )
+
+    answer_html = ""
+    if q.answer:
+        answer_html = (
+            "<div style='margin-top:12px; padding:10px; border-radius:8px; background:#f8fafc;"
+            " border:1px solid #e2e8f0;'>"
+            "<span style='color:#0f172a; font-weight:700'>参考答案：</span>"
+            f"<span style='color:#111827'>{html.escape(q.answer.strip())}</span>"
+            "</div>"
+        )
+
+    wrong_html = ""
+    if include_wrong:
+        wrong_times = getattr(q, "wrong_count", 0)
+        if wrong_times:
+            wrong_html = (
+                "<div style='margin-top:10px; color:#b91c1c; font-weight:700'>"
+                f"错题次数：{wrong_times}"
+                "</div>"
+            )
+
+    return "".join(
+        [
+            "<div style='line-height:1.7; font-size:15px; color:#0f172a'>",
+            title_html,
+            f"<div style='margin-top:8px; font-size:16px'>{body_html}</div>",
+            options_html,
+            answer_html,
+            wrong_html,
+            "</div>",
+        ]
+    )
+
+
 class QuestionOverviewDialog(QDialog):
     """题库总览窗口：展示所有题目，并支持收藏 / 取消收藏。"""
 
@@ -196,29 +259,31 @@ class QuestionOverviewDialog(QDialog):
         }
         QTableWidget {
             background-color: #ffffff;
-            color: #111827;
+            color: #0f172a;
             gridline-color: #d1d5db;
             font-size: 13px;
-            selection-background-color: #bfdbfe;
+            selection-background-color: #e0f2fe;
             selection-color: #0f172a;
         }
+        QTableWidget::item {
+            padding: 6px;
+        }
         QTableWidget::item:selected {
-            background-color: #bfdbfe;
+            background-color: #e0f2fe;
             color: #0f172a;
-            font-weight: 600;
-            border: none;
-            padding-left: 6px;
-            border-left: 3px solid #2563eb;
+            font-weight: 700;
+            border: 1px solid #bfdbfe;
+            border-radius: 4px;
         }
         QTableWidget::item:focus {
             outline: none;
         }
         QTableWidget::item:selected:hover {
-            background-color: #bfdbfe;
+            background-color: #e0f2fe;
             color: #0f172a;
         }
         QTableWidget::item:hover {
-            background-color: #eef2ff;
+            background-color: #f1f5f9;
         }
         QHeaderView::section {
             background-color: #e5edff;
@@ -330,32 +395,7 @@ class QuestionOverviewDialog(QDialog):
             return
 
         q = self.questions[row]
-        title = f"<b>题号：</b>{q.id}    <b>题型：</b>{qtype_label(q.q_type)}"
-        body = html.escape(q.question.strip()).replace("\n", "<br>")
-
-        option_lines = []
-        if q.options:
-            for label, text in sorted(q.options.items()):
-                opt_text = html.escape(text)
-                option_lines.append(f"<li><b>{label}.</b> {opt_text}</li>")
-        options_html = "".join(option_lines)
-
-        answer_html = ""
-        if q.answer:
-            answer_html = (
-                f"<div style='margin-top:8px'><b>参考答案：</b>{html.escape(q.answer.strip())}</div>"
-            )
-
-        html_text = "".join(
-            [
-                f"<div style='font-size:15px'>{title}</div>",
-                f"<div style='margin-top:6px; font-size:16px; line-height:1.6'>{body}</div>",
-                "<ul style='margin-top:8px; padding-left:16px'>" + options_html + "</ul>" if options_html else "",
-                answer_html,
-            ]
-        )
-
-        self.preview.setHtml(html_text)
+        self.preview.setHtml(build_preview_html(q))
         self._animate_preview()
 
     def _on_fav_button_clicked(self, row: int, qid: int, btn: QPushButton):
@@ -451,29 +491,31 @@ class WrongOverviewDialog(QDialog):
         }
         QTableWidget {
             background-color: #ffffff;
-            color: #111827;
+            color: #0f172a;
             gridline-color: #d1d5db;
             font-size: 13px;
-            selection-background-color: #bfdbfe;
+            selection-background-color: #e0f2fe;
             selection-color: #0f172a;
         }
+        QTableWidget::item {
+            padding: 6px;
+        }
         QTableWidget::item:selected {
-            background-color: #bfdbfe;
+            background-color: #e0f2fe;
             color: #0f172a;
-            font-weight: 600;
-            border: none;
-            padding-left: 6px;
-            border-left: 3px solid #2563eb;
+            font-weight: 700;
+            border: 1px solid #bfdbfe;
+            border-radius: 4px;
         }
         QTableWidget::item:focus {
             outline: none;
         }
         QTableWidget::item:selected:hover {
-            background-color: #bfdbfe;
+            background-color: #e0f2fe;
             color: #0f172a;
         }
         QTableWidget::item:hover {
-            background-color: #eef2ff;
+            background-color: #f1f5f9;
         }
         QHeaderView::section {
             background-color: #e5edff;
@@ -576,38 +618,7 @@ class WrongOverviewDialog(QDialog):
             return
 
         q = self.questions[row]
-        title = f"<b>题号：</b>{q.id}    <b>题型：</b>{qtype_label(q.q_type)}"
-        body = html.escape(q.question.strip()).replace("\n", "<br>")
-
-        option_lines = []
-        if q.options:
-            for label, text in sorted(q.options.items()):
-                opt_text = html.escape(text)
-                option_lines.append(f"<li><b>{label}.</b> {opt_text}</li>")
-        options_html = "".join(option_lines)
-
-        answer_html = ""
-        if q.answer:
-            answer_html = (
-                f"<div style='margin-top:8px'><b>参考答案：</b>{html.escape(q.answer.strip())}</div>"
-            )
-
-        wrong_html = ""
-        wrong_times = getattr(q, "wrong_count", 0)
-        if wrong_times:
-            wrong_html = f"<div style='margin-top:6px; color:#b91c1c'>错题次数：{wrong_times}</div>"
-
-        html_text = "".join(
-            [
-                f"<div style='font-size:15px'>{title}</div>",
-                f"<div style='margin-top:6px; font-size:16px; line-height:1.6'>{body}</div>",
-                "<ul style='margin-top:8px; padding-left:16px'>" + options_html + "</ul>" if options_html else "",
-                answer_html,
-                wrong_html,
-            ]
-        )
-
-        self.preview.setHtml(html_text)
+        self.preview.setHtml(build_preview_html(q, include_wrong=True))
         self._animate_preview()
 
     def _on_remove_clicked(self, qid: int, btn: QPushButton):
@@ -1617,10 +1628,19 @@ class QuizWindow(QMainWindow):
 
             self.set_status(f"题库导入成功，共 {c_total} 题。可以选择题型和题量开始刷题。")
             self.set_progress("题库已导入。")
+
+            success_msg = (
+                f"共 {c_total} 道题（单选 {c_single} · 填空 {c_blank} · 判断 {c_tf} · 简答 {c_short}）。"
+                "\n可以使用“题库总览 / 收藏题目”查看全部题目并收藏。"
+            )
+            self._show_result_dialog("题库导入成功", success_msg, success=True)
         except Exception as e:
             self.set_status(f"题库导入失败：{e}")
             self.set_feedback_text("导入失败，请检查题库格式是否为标准 .docx。")
             self.animate_feedback()
+
+            fail_msg = f"导入失败：{e}\n请检查文件是否为可读取的 .docx 题库。"
+            self._show_result_dialog("题库导入失败", fail_msg, success=False)
 
     def on_delete_bank(self):
         if not self._ask_delete_bank():
@@ -1808,12 +1828,17 @@ class QuizWindow(QMainWindow):
         layout.setContentsMargins(20, 16, 20, 16)
         layout.setSpacing(12)
 
+        accent_bar = QFrame(dialog)
+        accent_bar.setObjectName("dialogAccent")
+        accent_bar.setFixedHeight(4)
+
         title = QLabel("刷新统计数据")
         title.setObjectName("dialogTitle")
         desc = QLabel("是否将统计重置为初始值？选择“否”则仅重新读取当前统计数据。")
         desc.setWordWrap(True)
         desc.setObjectName("dialogDesc")
 
+        layout.addWidget(accent_bar)
         layout.addWidget(title)
         layout.addWidget(desc)
 
@@ -1831,7 +1856,6 @@ class QuizWindow(QMainWindow):
                 background-color: #f3f6fb;
                 border: 1px solid #cbd5e1;
                 border-radius: 12px;
-                border-top: 4px solid #2c3e50;
             }
             #dialogTitle {
                 font-size: 16px;
@@ -1857,6 +1881,11 @@ class QuizWindow(QMainWindow):
             }
             QDialog QPushButton:pressed {
                 background-color: #0f172a;
+            }
+            QFrame#dialogAccent {
+                background-color: #1f2937;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
             }
             """
         )
@@ -1889,12 +1918,17 @@ class QuizWindow(QMainWindow):
         layout.setContentsMargins(20, 16, 20, 16)
         layout.setSpacing(12)
 
+        accent_bar = QFrame(dialog)
+        accent_bar.setObjectName("dialogAccent")
+        accent_bar.setFixedHeight(4)
+
         title = QLabel("删除当前题库？")
         title.setObjectName("dialogTitle")
         desc = QLabel("删除后将同时清空错题本并重置统计，操作不可撤销。")
         desc.setWordWrap(True)
         desc.setObjectName("dialogDesc")
 
+        layout.addWidget(accent_bar)
         layout.addWidget(title)
         layout.addWidget(desc)
 
@@ -1913,7 +1947,6 @@ class QuizWindow(QMainWindow):
                 background-color: #f7f1ed;
                 border: 1px solid #e2e8f0;
                 border-radius: 12px;
-                border-top: 4px solid #2c3e50;
             }
             #dialogTitle {
                 font-size: 16px;
@@ -1944,6 +1977,11 @@ class QuizWindow(QMainWindow):
             QPushButton#dangerBtn:hover {
                 background-color: #b91c1c;
             }
+            QFrame#dialogAccent {
+                background-color: #dc2626;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
             """
         )
 
@@ -1959,6 +1997,82 @@ class QuizWindow(QMainWindow):
 
         dialog.exec()
         return confirmed
+
+    def _show_result_dialog(self, title: str, message: str, success: bool = True):
+        dialog = QDialog(self)
+        dialog.setWindowTitle(title)
+        dialog.setWindowIcon(self.app_icon)
+        dialog.setModal(True)
+
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 12, 20, 16)
+        layout.setSpacing(12)
+
+        accent_bar = QFrame(dialog)
+        accent_bar.setObjectName("dialogAccent")
+        accent_bar.setFixedHeight(4)
+
+        title_lbl = QLabel(title)
+        title_lbl.setObjectName("dialogTitle")
+        desc_lbl = QLabel(message)
+        desc_lbl.setObjectName("dialogDesc")
+        desc_lbl.setWordWrap(True)
+
+        layout.addWidget(accent_bar)
+        layout.addWidget(title_lbl)
+        layout.addWidget(desc_lbl)
+
+        btn_row = QHBoxLayout()
+        btn_row.addStretch()
+        btn_ok = QPushButton("好的")
+        btn_row.addWidget(btn_ok)
+        layout.addLayout(btn_row)
+
+        accent_color = "#16a34a" if success else "#dc2626"
+        title_color = "#166534" if success else "#b91c1c"
+
+        dialog.setStyleSheet(
+            f"""
+            QDialog {{
+                background-color: #f3f6fb;
+                border: 1px solid #cbd5e1;
+                border-radius: 12px;
+            }}
+            #dialogTitle {{
+                font-size: 16px;
+                font-weight: 700;
+                color: {title_color};
+            }}
+            #dialogDesc {{
+                font-size: 13px;
+                color: #334155;
+            }}
+            QDialog QPushButton {{
+                padding: 8px 16px;
+                border-radius: 8px;
+                border: 1px solid #1f2937;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #334155, stop:1 #1f2937);
+                color: #e2e8f0;
+                min-width: 92px;
+                font-weight: 700;
+            }}
+            QDialog QPushButton:hover {{
+                background-color: #1f2937;
+                border-color: #1f2937;
+            }}
+            QDialog QPushButton:pressed {{
+                background-color: #0f172a;
+            }}
+            QFrame#dialogAccent {{
+                background-color: {accent_color};
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }}
+            """
+        )
+
+        btn_ok.clicked.connect(dialog.accept)
+        dialog.exec()
 
     # ---------- 开始刷题 ----------
 
