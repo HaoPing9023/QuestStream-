@@ -220,7 +220,7 @@ class QuestionOverviewDialog(QDialog):
         self.table.setHorizontalHeaderLabels(["题号", "题型", "题干预览", "收藏"])
         self.table.verticalHeader().setVisible(False)
         # 留出足够行高，让收藏按钮垂直居中且不被裁切，同时避免显得过高
-        self.table.verticalHeader().setDefaultSectionSize(46)
+        self.table.verticalHeader().setDefaultSectionSize(40)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -270,7 +270,7 @@ class QuestionOverviewDialog(QDialog):
             selection-color: #0f172a;
         }
         QTableWidget::item {
-            padding: 6px;
+            padding: 4px 6px;
         }
         QTableWidget::item:selected {
             background-color: #e0f2fe;
@@ -296,16 +296,16 @@ class QuestionOverviewDialog(QDialog):
             font-weight: 600;
         }
         QPushButton#favoriteBtn {
-            padding: 4px 12px;
-            border-radius: 14px;
+            padding: 3px 10px;
+            border-radius: 12px;
             border: 2px solid #7c3aed;
             background-color: #ede9fe;
             color: #312e81;
             font-weight: 800;
             font-size: 13px;
             letter-spacing: 0.5px;
-            min-height: 30px;
-            min-width: 128px;
+            min-height: 26px;
+            min-width: 118px;
         }
         QPushButton#favoriteBtn:hover {
             background-color: #ddd6fe;
@@ -407,14 +407,14 @@ class QuestionOverviewDialog(QDialog):
             btn.setFocusPolicy(Qt.NoFocus)
             btn.setFont(button_font)
             btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            btn.setMinimumWidth(128)
-            btn.setMinimumHeight(30)
+            btn.setMinimumWidth(118)
+            btn.setMinimumHeight(26)
             self._update_fav_button_text(btn, q.id)
             btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
-            container_layout.setContentsMargins(4, 4, 4, 4)
+            container_layout.setContentsMargins(2, 2, 2, 2)
             container_layout.setSpacing(0)
             container_layout.setAlignment(Qt.AlignCenter)
             container_layout.addWidget(btn)
@@ -422,7 +422,7 @@ class QuestionOverviewDialog(QDialog):
             self.table.setCellWidget(row, 3, container)
 
         # 确保“收藏 / 取消收藏”按钮列足够展示完整文本且居中
-        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 168))
+        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 150))
 
     def _update_fav_button_text(self, btn: QPushButton, qid: int):
         if qid in self.favorite_ids:
@@ -506,7 +506,7 @@ class WrongOverviewDialog(QDialog):
         self.table = QTableWidget(len(self.questions), 5, self)
         self.table.setHorizontalHeaderLabels(["题号", "题型", "题干预览", "错题次数", "操作"])
         self.table.verticalHeader().setVisible(False)
-        self.table.verticalHeader().setDefaultSectionSize(42)
+        self.table.verticalHeader().setDefaultSectionSize(38)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -554,7 +554,7 @@ class WrongOverviewDialog(QDialog):
             selection-color: #0f172a;
         }
         QTableWidget::item {
-            padding: 6px;
+            padding: 4px 6px;
         }
         QTableWidget::item:selected {
             background-color: #e0f2fe;
@@ -598,14 +598,14 @@ class WrongOverviewDialog(QDialog):
             outline: none;
         }
         QPushButton#removeWrongBtn {
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 8px;
             border: 1px solid #f87171;
             background-color: #fef2f2;
             color: #b91c1c;
             font-weight: 700;
             font-size: 12px;
-            min-height: 30px;
+            min-height: 26px;
         }
         QPushButton#removeWrongBtn:hover {
             background-color: #fee2e2;
@@ -658,13 +658,13 @@ class WrongOverviewDialog(QDialog):
             btn.setObjectName("removeWrongBtn")
             btn.setFocusPolicy(Qt.NoFocus)
             btn.setFont(button_font)
-            btn.setMinimumWidth(112)
-            btn.setMinimumHeight(30)
+            btn.setMinimumWidth(110)
+            btn.setMinimumHeight(26)
             btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
-            container_layout.setContentsMargins(4, 4, 4, 4)
+            container_layout.setContentsMargins(2, 2, 2, 2)
             container_layout.setSpacing(0)
             container_layout.setAlignment(Qt.AlignCenter)
             container_layout.addWidget(btn)
@@ -672,7 +672,7 @@ class WrongOverviewDialog(QDialog):
             self.table.setCellWidget(row, 4, container)
 
         # 让“移出错题本”按钮列保持足够宽度并保持居中显示
-        self.table.setColumnWidth(4, max(self.table.columnWidth(4), 132))
+        self.table.setColumnWidth(4, max(self.table.columnWidth(4), 122))
 
     def _on_row_clicked(self, model_index):
         row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
