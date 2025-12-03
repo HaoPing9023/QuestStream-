@@ -225,6 +225,7 @@ class QuestionOverviewDialog(QDialog):
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setAlternatingRowColors(True)
         self.table.setAutoScroll(False)
+        self.table.setFocusPolicy(Qt.NoFocus)
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
@@ -237,9 +238,11 @@ class QuestionOverviewDialog(QDialog):
         preview_layout = QVBoxLayout(preview_group)
         self.preview = QTextEdit(self)
         self.preview.setReadOnly(True)
-        self.preview.setMinimumHeight(160)
+        self.preview.setMinimumHeight(230)
         self.preview.setPlaceholderText("点击表格中的题目行，可以在这里预览题干和答案。")
         self.preview.setFont(QFont("Microsoft YaHei", 12))
+        self.preview.setLineWrapMode(QTextEdit.WidgetWidth)
+        self.preview.document().setDocumentMargin(8)
         preview_layout.addWidget(self.preview)
         layout.addWidget(preview_group)
 
@@ -272,9 +275,12 @@ class QuestionOverviewDialog(QDialog):
             background-color: #e0f2fe;
             color: #0f172a;
             font-weight: 700;
+            outline: none;
+            border: none;
         }
         QTableWidget::item:focus {
             outline: none;
+            border: none;
         }
         QTableWidget::item:selected:hover {
             background-color: #e0f2fe;
@@ -303,19 +309,23 @@ class QuestionOverviewDialog(QDialog):
             background-color: #ffffff;
             border: 1px solid #d1d5db;
             border-radius: 6px;
-            padding: 8px;
+            padding: 10px;
             font-size: 14px;
             outline: none;
+            line-height: 1.6;
         }
         QPushButton {
-            padding: 6px 12px;
-            border-radius: 4px;
-            border: 1px solid #cbd5e1;
-            background-color: #ffffff;
-            min-width: 92px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #c7d2fe;
+            background-color: #e0e7ff;
+            color: #0f172a;
+            font-weight: 600;
+            min-width: 96px;
         }
         QPushButton:hover {
-            background-color: #eff6ff;
+            background-color: #c7d2fe;
+            border-color: #a5b4fc;
         }
         """)
 
@@ -469,9 +479,11 @@ class WrongOverviewDialog(QDialog):
         preview_layout = QVBoxLayout(preview_group)
         self.preview = QTextEdit(self)
         self.preview.setReadOnly(True)
-        self.preview.setMinimumHeight(170)
+        self.preview.setMinimumHeight(230)
         self.preview.setPlaceholderText("点击表格中的题目行，可以在这里预览题干和答案。")
         self.preview.setFont(QFont("Microsoft YaHei", 12))
+        self.preview.setLineWrapMode(QTextEdit.WidgetWidth)
+        self.preview.document().setDocumentMargin(8)
         preview_layout.addWidget(self.preview)
         layout.addWidget(preview_group)
 
@@ -979,6 +991,10 @@ class QuizWindow(QMainWindow):
         bottom_layout.setContentsMargins(12, 4, 12, 8)
         self.status_label = QLabel("先导入题库或使用默认题库，然后选择题型和题量开始刷题。")
         bottom_layout.addWidget(self.status_label, 1)
+        bottom_layout.addStretch()
+        self.footer_label = QLabel("感谢使用本地刷题系统 · 产品反馈邮箱：haoping0124@gmail.com")
+        self.footer_label.setObjectName("footerNote")
+        bottom_layout.addWidget(self.footer_label, 0, Qt.AlignRight)
         root_layout.addWidget(bottom_frame)
 
         # 信号连接
@@ -1055,6 +1071,10 @@ class QuizWindow(QMainWindow):
 
         QLabel {
             font-size: 15px;
+        }
+        #footerNote {
+            font-size: 12px;
+            color: #6b7280;
         }
         #answerSummary {
             font-size: 15px;
