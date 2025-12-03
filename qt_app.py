@@ -377,9 +377,19 @@ class QuestionOverviewDialog(QDialog):
             btn = QPushButton(self)
             btn.setFocusPolicy(Qt.NoFocus)
             btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            btn.setMinimumWidth(96)
             self._update_fav_button_text(btn, q.id)
             btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
-            self.table.setCellWidget(row, 3, btn)
+
+            container = QWidget(self)
+            container_layout = QHBoxLayout(container)
+            container_layout.setContentsMargins(0, 0, 0, 0)
+            container_layout.setAlignment(Qt.AlignCenter)
+            container_layout.addWidget(btn)
+            self.table.setCellWidget(row, 3, container)
+
+        # 确保“收藏 / 取消收藏”按钮列足够展示完整文本且居中
+        self.table.setColumnWidth(3, max(self.table.columnWidth(3), 120))
 
     def _update_fav_button_text(self, btn: QPushButton, qid: int):
         if qid in self.favorite_ids:
@@ -611,8 +621,18 @@ class WrongOverviewDialog(QDialog):
             btn = QPushButton("移出错题本", self)
             btn.setObjectName("removeWrongBtn")
             btn.setFocusPolicy(Qt.NoFocus)
+            btn.setMinimumWidth(108)
             btn.clicked.connect(partial(self._on_remove_clicked, q.id, btn))
-            self.table.setCellWidget(row, 4, btn)
+
+            container = QWidget(self)
+            container_layout = QHBoxLayout(container)
+            container_layout.setContentsMargins(0, 0, 0, 0)
+            container_layout.setAlignment(Qt.AlignCenter)
+            container_layout.addWidget(btn)
+            self.table.setCellWidget(row, 4, container)
+
+        # 让“移出错题本”按钮列保持足够宽度并保持居中显示
+        self.table.setColumnWidth(4, max(self.table.columnWidth(4), 130))
 
     def _on_row_clicked(self, model_index):
         row = model_index.row() if hasattr(model_index, "row") else self.table.currentRow()
