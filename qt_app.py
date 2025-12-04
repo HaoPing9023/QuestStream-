@@ -971,7 +971,7 @@ class QuizWindow(QMainWindow):
         progress_layout.setContentsMargins(10, 4, 10, 4)
         self.progress_label = QLabel("当前未在刷题。")
         progress_layout.addWidget(self.progress_label)
-        progress_layout.addStretch()
+        progress_layout.addSpacing(10)
         self.btn_remove_wrong = QPushButton("移出错题本")
         self.btn_remove_wrong.setObjectName("removeWrongInline")
         progress_layout.addWidget(self.btn_remove_wrong)
@@ -980,6 +980,7 @@ class QuizWindow(QMainWindow):
         self.btn_star_favorite.setToolTip("点击收藏 / 取消收藏当前题目")
         self.btn_star_favorite.setCheckable(True)
         progress_layout.addWidget(self.btn_star_favorite)
+        progress_layout.addStretch()
         center_panel.addWidget(progress_frame)
 
         question_group = QGroupBox("题目")
