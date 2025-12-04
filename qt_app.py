@@ -297,15 +297,15 @@ class QuestionOverviewDialog(QDialog):
             font-weight: 600;
         }
         QPushButton#favoriteBtn {
-            padding: 2px 8px;
-            border-radius: 9px;
+            padding: 1px 6px;
+            border-radius: 8px;
             border: 1px solid #cbd5e1;
             background-color: #f8fafc;
             color: #0f172a;
             font-weight: 700;
             font-size: 12px;
-            min-height: 22px;
-            min-width: 104px;
+            min-height: 20px;
+            min-width: 92px;
             transition: all 120ms ease;
         }
         QPushButton#favoriteBtn:hover {
@@ -392,6 +392,7 @@ class QuestionOverviewDialog(QDialog):
 
         for row, q in enumerate(self.questions):
             item_id = QTableWidgetItem(str(q.id))
+            item_id.setTextAlignment(Qt.AlignCenter)
             item_type = QTableWidgetItem(qtype_label(q.q_type))
             text = q.question.replace("\n", " ")
             if len(text) > 40:
@@ -407,18 +408,18 @@ class QuestionOverviewDialog(QDialog):
             btn.setFocusPolicy(Qt.NoFocus)
             btn.setFont(button_font)
             btn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            btn.setMinimumWidth(108)
-            btn.setMinimumHeight(22)
+            btn.setMinimumWidth(96)
+            btn.setMinimumHeight(20)
             self._update_fav_button_text(btn, q.id)
             btn.clicked.connect(partial(self._on_fav_button_clicked, row, q.id, btn))
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
-            container_layout.setContentsMargins(2, 0, 2, 0)
+            container_layout.setContentsMargins(0, 0, 0, 0)
             container_layout.setSpacing(0)
-            container_layout.setAlignment(Qt.AlignCenter)
+            container_layout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             container_layout.addWidget(btn)
-            container_layout.setAlignment(btn, Qt.AlignCenter)
+            container_layout.setAlignment(btn, Qt.AlignLeft | Qt.AlignVCenter)
             self.table.setCellWidget(row, 3, container)
 
         # 确保“收藏 / 取消收藏”按钮列足够展示完整文本且不显得过宽
@@ -654,6 +655,7 @@ class WrongOverviewDialog(QDialog):
 
         for row, q in enumerate(self.questions):
             item_id = QTableWidgetItem(str(q.id))
+            item_id.setTextAlignment(Qt.AlignCenter)
             item_type = QTableWidgetItem(qtype_label(q.q_type))
             text = q.question.replace("\n", " ")
             if len(text) > 40:
@@ -671,18 +673,18 @@ class WrongOverviewDialog(QDialog):
             btn.setObjectName("removeWrongBtn")
             btn.setFocusPolicy(Qt.NoFocus)
             btn.setFont(button_font)
-            btn.setMinimumWidth(112)
-            btn.setMinimumHeight(22)
+            btn.setMinimumWidth(100)
+            btn.setMinimumHeight(20)
             btn.clicked.connect(partial(self._on_toggle_clicked, q, btn))
             self._update_button_text(btn, True)
 
             container = QWidget(self)
             container_layout = QHBoxLayout(container)
-            container_layout.setContentsMargins(6, 0, 6, 0)
+            container_layout.setContentsMargins(2, 0, 2, 0)
             container_layout.setSpacing(0)
-            container_layout.setAlignment(Qt.AlignCenter)
+            container_layout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             container_layout.addWidget(btn)
-            container_layout.setAlignment(btn, Qt.AlignCenter)
+            container_layout.setAlignment(btn, Qt.AlignLeft | Qt.AlignVCenter)
             self.table.setCellWidget(row, 4, container)
 
         # 让“移出错题本”按钮列保持足够宽度并保持居中显示
